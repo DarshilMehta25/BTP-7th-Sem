@@ -1,18 +1,20 @@
 from Classes.ED import ED
 from typing import List
+from SRA import SRA
 
-def SUM(X: set, Nx: List[ED]):
+#Singleton Utility Maximization
+def SUM(Nx: List[ED], W:float, F: float):
     
     UxSUM = 0
     NxO: List[ED] = []
 
     while len(Nx) > 0:
 
-        best_density = float('-int')
+        best_density = float('-inf')
         i_ = -1
         selected_utility = 0
 
-        for device in Nx:
+        for device in Nx: #yaha jo device hain yo potential hai, matlab NxO me ho bhi sakta hain ya nhi
             U_X_i, Wi_list, Fi_list = SRA(device,W,F)
             total_w = sum(Wi_list)
             total_f = sum(Fi_list)

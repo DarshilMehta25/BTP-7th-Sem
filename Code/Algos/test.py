@@ -55,7 +55,17 @@ J = set([model1, model2, model3, model4, model5])
 
 # print(maxutil(EDs,J))
 
-print([i for i in MUMS(EDs, J, 0, 0, 512)])
+# print([i for i in MUMS(EDs, J, 0, 0, 512)])
+
+# cached_model = MUMS(EDs, J, 0, 0, 512)[0]
+model =  MUMS(EDs, J, 0, 0, 512)
+
+item1 = model[0]
+item2 = model[1]
+# print(*cached_model)
+print(*item1)
+print(*item2)
+
 # print(MUMS(EDs, J, 0, 0, 512))
 
 # l = [1,2,3]

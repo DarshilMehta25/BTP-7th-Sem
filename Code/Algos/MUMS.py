@@ -15,24 +15,27 @@ def pot_offloaders(EDs: List[ED], model: Model) -> Set[ED]: #list of potential o
     Nx = {device for device in EDs if(device.model.name == model.name)}
     return Nx
 
-def maxutil(EDs: List[ED], J: Set[Model]) -> Model:
+def maxutil(EDs: List[ED], J: Set[Model], W: float, F: float) -> Model: #utility calculate kese ki hain ke jitne device ko model chahie
     utility_to_size = dict()
 
     for model in J:
 
         Nj = pot_offloaders(EDs, model)
-        utility_to_size[model] = (len(Nj)/model.storage)
+        model_utility, _ = SUM(Nj, W, F)
+        utility_to_size[model] = (model_utility/model.storage)
     
     if(utility_to_size != dict()): return max(utility_to_size, key=utility_to_size.get)
 
 def MUMS(EDs: List[ED], J: set, W: float, F: float, S: float): 
+
     X: Set[Model] = set() #set of cached models
     Ux: int = 0 #utility gained by caching models X
-    Nx: List[Model] = []
+    Nx: List[ED] = []
+
     while(utilized_storage(X) <= S and J != Set[Model]):
 
         sj = utilized_storage(X)
-        j_ = maxutil(EDs, J)
+        j_ = maxutil(EDs, J, W, F) #Model return kare, single
 
         if (j_ == None): break
 
@@ -44,7 +47,9 @@ def MUMS(EDs: List[ED], J: set, W: float, F: float, S: float):
     for model in X:
         pot_offl = pot_offloaders(EDs, model)
         pot_offl = list(pot_offl)
+        # print(f"Potential Offloaders: {model.name} are {pot_offl}")
         Nx += pot_offl
+        # print(Nx)
 
-    NxO, UxNxO = SUM(X, Nx)
+    UxNxO, NxO = SUM(X, Nx)
     return X, NxO, UxNxO
