@@ -1,5 +1,4 @@
 import numpy as np
-
 #Server Resource Algorithm
 
 # we can like hardcode cnn model
@@ -7,15 +6,27 @@ Fi=[20, 30, 40, 50]# flops required per layer
 Oi=[100, 80, 50, 20]#output size after each layer
 Li=len(Fi) - 1 #total number of layers in the CNN model of user/device i
 
-
 #say device parameters be:
-fl_i=20 #local computation power
-pi_tx=2 #transmission power
-hi=10 #channel coefficient
-sigma2_i=1 #noise power
-Ic=1 #interference
+fl_i=12 #local computation power
+pi_tx=50 #transmission power
+hi=0.5 #channel coefficient
+sigma2_i=0.6 #noise power
+Ic= 10 ** (-13) #interference
+deadline = 5
 
-deadline = 10
+k_i = 0.5
+gamma_i = 0.1
+p_i = 2
+beta_i = 0.8
+
+
+
+
+
+
+
+
+
 
 #the ED compute: partition point di, total delay, wheater deadline satisfies
 def user_response(wi, fi_edge):
@@ -23,6 +34,8 @@ def user_response(wi, fi_edge):
     best_delay = float('inf') #infinity
     best_rl = 0
     best_ru = 0
+
+
 
     #we will try every partition layer and then
     for di in range(Li + 1):
@@ -33,20 +46,20 @@ def user_response(wi, fi_edge):
         T2 = sum(Fi[di + 1:]) #eqn (6)
 
         # local inference delay
-        rl = T1 / fl_i
+        rl = T1 / fl_i #local inference time for ED
 
         # edge inference delay
         if fi_edge == 0:
             re = float('inf')
         else:
-            re = T2 / fi_edge
+            re = T2 / fi_edge #inference time for EDi on edge server
 
         # transmission rate
         rate = wi * np.log2(
             1 + (pi_tx * hi) / (sigma2_i + Ic)
         )
 
-        # upload delay
+        # upload delay -> depends on ED (differ)
         if rate == 0:
             ru = float('inf')
         else:
@@ -90,7 +103,6 @@ def do_computation(Nx0, W, F):
 
                 if w_i >= W:
                     continue
-
                 if f_i >= F:
                     continue
 
@@ -98,23 +110,10 @@ def do_computation(Nx0, W, F):
                     break
 
                 #compute delay kitna hai
-                d_i, delay, rl, ru = user_response(w_i, f_i)
+                best_partition, best_delay, best_rl, best_ru = user_response(w_i, f_i) #batched try
 
                 #deadline constraint check karenge in this
-                if d_i != -1:
-
-                    #Compute utility/profit π_i
-                    #C_i_0 = Local inference cost
-                    #k_i=energy consumption parameter
-                    #gamma_i=the unit local energy cost
-                    #p_i=the resources allocated to Edi
-                    #f_i=Local resources of EDi
-                    #beta_i=transmission power efficiency parameter
-                    #C_i_0 = 100
-                    k_i = 0.5
-                    gamma_i = 1.2
-                    p_i = 2
-                    beta_i = 0.8
+                if best_partition != -1:
 
                     local_delay = sum(Fi) / fl_i #eqn (2)
 
@@ -125,11 +124,13 @@ def do_computation(Nx0, W, F):
                             * gamma_i
                     )
 
+
                     pi_i = (
                             C_i_0
-                            - rl * ((fl_i ** 2) * k_i * gamma_i)
-                            - ru * (p_i * beta_i * gamma_i)
+                            - best_rl * ((fl_i ** 2) * k_i * gamma_i)
+                            - best_ru * (p_i * beta_i * gamma_i)
                     )
+
 
                     # Maximize π_i
                     if pi_i > pyi_max:
@@ -147,7 +148,8 @@ def do_computation(Nx0, W, F):
         F -= fi_final
 
         #and update utility
-        UxNx0+=pyi_max
+        if (pyi_max != float('-inf')):
+            UxNx0 += pyi_max
 
     return UxNx0,Wi_list,Fi_list
 
@@ -178,7 +180,7 @@ def SRA(i,W,F):
 
 
 if __name__ == '__main__':
-    UxNx0, Wi_list,Fi_list=SRA()
+    UxNx0, Wi_list,Fi_list=SRA(50, 10000, 8800)
     print(UxNx0)
     print(*Wi_list)
     print(*Fi_list)

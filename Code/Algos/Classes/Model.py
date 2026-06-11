@@ -15,6 +15,9 @@ class Model:
     layers: Layers
     storage: float
 
+    @property
+    def no_of_layers(self) -> int: return len(self.layers.output_of_layers)
+
     def __hash__(self):
         return hash((self.name, self.layers))
 

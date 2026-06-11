@@ -3,16 +3,16 @@ import ED
 from typing import List, Set
 from MUMS import MUMS
 from SingletonUM import SUM
+from ServerRA import SRA
+from dataclasses import dataclass
 
+@dataclass
 class ESP:
 
     servers: List[EdgeServer]
     devices: List[ED] #Pehle saare device pass kardenge jo connected hain ESP se
 
     def response(self): #gather user response
-        pass
-
-    def SRA(self):
         pass
 
     def SUM(self, Nx: List[ED], W:float, F:float):
