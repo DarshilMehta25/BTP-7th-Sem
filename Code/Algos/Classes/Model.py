@@ -13,13 +13,11 @@ class Layers:
 class Model:
     name: str
     layers: Layers
-    storage: float
+    storage: float #In MBs
 
     @property
-    def no_of_layers(self) -> int: return len(self.layers.output_of_layers)
+    def no_of_layers(self) -> int:
+        return len(self.layers.output_of_layer)
 
     def __hash__(self):
         return hash((self.name, self.layers))
-
-    @property
-    def no_of_layers(self) -> int: return len(self.layers.computation_per_layer)

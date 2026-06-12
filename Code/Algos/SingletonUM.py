@@ -1,6 +1,6 @@
 from Classes.ED import ED
 from typing import List
-from SRA import SRA
+from ServerRA_i import SRA_i
 
 #Singleton Utility Maximization
 def SUM(Nx: List[ED], W:float, F: float):
@@ -15,22 +15,21 @@ def SUM(Nx: List[ED], W:float, F: float):
         selected_utility = 0
 
         for device in Nx: #yaha jo device hain yo potential hai, matlab NxO me ho bhi sakta hain ya nhi
-            U_X_i, Wi_list, Fi_list = SRA(device,W,F)
-            total_w = sum(Wi_list)
-            total_f = sum(Fi_list)
+            U_X_i, Wi, Fi = SRA_i(device,W,F)
+
 
             # Avoid Division by 0
-            if total_w + total_f == 0:
+            if Fi + Wi == 0:
                 continue
 
-            density = (U_X_i/(total_w + total_f))
+            density = (U_X_i/(Wi + Fi))
 
             if density > best_density:
                 best_density = density
                 i_ = device
                 selected_utility = U_X_i
-                selected_w = total_w
-                selected_f = total_f
+                selected_w = Wi
+                selected_f = Fi
         
         if i_ == -1: #No feasible user
             break
@@ -45,5 +44,4 @@ def SUM(Nx: List[ED], W:float, F: float):
         if W <= 0 or F <= 0: #Resource Exhausted
             break
 
-    
     return UxSUM, NxO
