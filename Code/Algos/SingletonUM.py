@@ -15,7 +15,7 @@ def SUM(Nx: List[ED], W:float, F: float):
         selected_utility = 0
 
         for device in Nx: #yaha jo device hain yo potential hai, matlab NxO me ho bhi sakta hain ya nhi
-            U_X_i, Wi, Fi = SRA_i(device,W,F)
+            U_X_i, Wi, Fi, _, _ = SRA_i(device,W,F)
 
 
             # Avoid Division by 0

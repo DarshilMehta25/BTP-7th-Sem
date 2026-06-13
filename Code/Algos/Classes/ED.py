@@ -40,12 +40,19 @@ class ED:
         return sum(self.model.layers.computation_per_layer[:di]) #returns local inference cose corresponding to partition layer
     
     def offloading_decision(self, wi: float, fi: float, sigma: float):
+
         best_partition = -1
         best_delay = float('inf') #infinity
         best_rl = 0
         best_ru = 0
+        min_pi = float("inf")
         ai = 0
 
+        # transmission rate
+        rate = wi * np.log2(
+                1 + (self.transmission_power * self.channel_coefficient) / (sigma + Ic)
+            )
+        
         #we will try every partition layer and then
         for di in range(self.model.no_of_layers):
             # local computation FLOPS
@@ -66,11 +73,6 @@ class ED:
             else:
                 re = T2 / fi #inference time for EDi on edge server
 
-            # transmission rate
-            rate = wi * np.log2(
-                1 + (self.transmission_power * self.channel_coefficient) / (sigma + Ic)
-            )
-
             # upload delay -> depends on ED (differ)
             if rate == 0:
                 ru = float('inf')
@@ -88,13 +90,14 @@ class ED:
 
                 # choose best partition
                 if total_delay < best_delay:
-                    # print(best_delay)
                     best_delay = total_delay
                     best_partition = di
                     best_rl = rl
                     best_ru = ru
+            
 
-        return best_partition, best_delay, best_rl, best_ru, ai
+
+        return best_partition,best_rl, best_ru, ai
 
 
     def simulate_inference_delay(self):

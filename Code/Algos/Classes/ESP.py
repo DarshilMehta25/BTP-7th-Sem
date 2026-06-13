@@ -14,6 +14,7 @@ class ESP:
 
     def SRA(NoX:List[ED], W:float, F: float):
         return SRA(NoX, W, F)
+        
     def SUM(self, Nx: List[list: ED], W:float, F:float):
         return SUM(Nx, W, F)
 
