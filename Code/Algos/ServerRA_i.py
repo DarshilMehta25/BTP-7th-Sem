@@ -3,7 +3,7 @@ import numpy as np
 
 #Server Resource Allocation fir Each Device
 
-def SRA_i(ed: ED, W: float, F: float, pw: float, pf: float):
+def SRA_i(ed: ED, W: float, F: float):
     pi_max = float('-inf')
     
     wi_final = 0
@@ -13,7 +13,7 @@ def SRA_i(ed: ED, W: float, F: float, pw: float, pf: float):
         return pi_max, wi_final, fi_final
     
     g = 0.1
-    ratios=np.arange(g,1.1,g)
+    ratios=np.arange(g,0.6,g)
 
     w_values=ratios*W
     # print(*w_values)
@@ -68,5 +68,8 @@ def SRA_i(ed: ED, W: float, F: float, pw: float, pf: float):
                         # print(pi_max)
                         # print(wi_final)
                         # print(fi_final)
+
+                        W -= wi_final
+                        F -= fi_final
 
     return pi_max, wi_final, fi_final

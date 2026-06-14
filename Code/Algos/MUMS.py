@@ -32,9 +32,9 @@ def MUMS(EDs: List[ED], J: set, W: float, F: float, S: int):
     # Ux: int = 0 #utility gained by caching models X
     Nx: List[ED] = []
 
-    while(utilized_storage(X) <= S and J != Set[Model]):
+    while(utilized_storage(X) <= S and J != set()):
 
-        sj = utilized_storage(X)
+        # sj = utilized_storage(X)
         j_ = maxutil(EDs, J, W, F) #Model return kare, single
 
         if (j_ == None): break
@@ -51,5 +51,6 @@ def MUMS(EDs: List[ED], J: set, W: float, F: float, S: int):
         Nx += pot_offl
         # print(Nx)
 
-    UxNxO, NxO = SUM(X, Nx)
+    UxNxO, NxO = SUM(Nx,W,F)
+    
     return X, NxO, UxNxO

@@ -45,7 +45,7 @@ class ED:
         best_delay = float('inf') #infinity
         best_rl = 0
         best_ru = 0
-        min_pi = float("inf")
+        # min_pi = float("inf")
         ai = 0
 
         # transmission rate

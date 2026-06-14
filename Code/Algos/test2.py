@@ -11,18 +11,20 @@ mobilenet = Model(
     layers= layer(5)
 )
 
+resnet18 = Model(
+    name="Resnet18",
+    storage=350,
+    layers=layer(18)
+)
+
+resnet50 = Model(
+    name="Resnet50",
+    storage=550,
+    layers=layer(50)
+)
+
 # Wi_list=[]
 # Fi_list=[]
-
-ed =    ED(
-        local_comp_res=12e9, 
-        model=mobilenet,
-        task_deadline=5,
-        channel_coefficient=0.5,
-        transmission_power=20e-3,
-        energy_consumption_param=0.5,
-        transmision_antenna_power_eff_param=0.75
-    )
 
 # UxNoX: float = 0
 # g = 0.1
@@ -122,7 +124,7 @@ EDs = [
         task_deadline=5,
         # local_computation_power=2,
         channel_coefficient=0.5,
-        transmission_power=0.8,
+        transmission_power=80e-3,
         energy_consumption_param=0.5,
         transmision_antenna_power_eff_param=0.75
     ),
@@ -133,53 +135,51 @@ EDs = [
         task_deadline=2,
         # local_computation_power=2,
         channel_coefficient=0.2,
-        transmission_power=0.5,
+        transmission_power=25e-3,
         energy_consumption_param=0.7,
         transmision_antenna_power_eff_param=0.80
     ),
 
-    # ResNet18 users
     ED(
         local_comp_res=13,
         model=mobilenet,
         task_deadline=4,
         # local_computation_power=3,
         channel_coefficient=0.35,
-        transmission_power=0.6,
+        transmission_power=10e-3,
         energy_consumption_param=0.3,
         transmision_antenna_power_eff_param=0.82
     ),
 
     ED(
         local_comp_res=10,
-        model=mobilenet,
+        model=resnet18,
         task_deadline=1,
         # local_computation_power=3,
         channel_coefficient=0.75,
-        transmission_power=0.7,
+        transmission_power=50e-3,
         energy_consumption_param=0.95,
         transmision_antenna_power_eff_param=0.85
     ),
 
-    # ResNet50 users
     ED(
         local_comp_res=15,
         model=mobilenet,
         task_deadline=6,
         # local_computation_power=4,
         channel_coefficient=0.95,
-        transmission_power=0.8,
+        transmission_power=50e-3,
         energy_consumption_param=0.45,
         transmision_antenna_power_eff_param=0.88
     ),
 
     ED(
         local_comp_res=10,
-        model=mobilenet,
+        model=resnet50,
         task_deadline=6,
         # local_computation_power=5,
         channel_coefficient=1,
-        transmission_power=1.0,
+        transmission_power=100e-3,
         energy_consumption_param=0.15,
         transmision_antenna_power_eff_param=0.90
     )
@@ -188,18 +188,21 @@ EDs = [
 # for ed in EDs:
 #     print(SRA_i(ed,20e6, 800e9))
 
-result= SRA(EDs,20e6, 800e9)
-Utility = result[0]
-Wi_list = result[1]
-Fi_list = result[2]
+# result= SRA(EDs,20e6, 800e9) #W = 20MHz F = 800 GFlopsPS
+# Utility = result[0]
+# Wi_list = result[1]
+# Fi_list = result[2]
 
-print(Utility)
+# print(Utility)
 
-print("Wi_List:")
-for i,j in enumerate(Wi_list):
-    print(i,j)
+# print("Wi_List:")
+# for i,j in enumerate(Wi_list):
+#     print(i,j)
 
-print("*"*30)
-print("Fi_List:")
-for i,j in enumerate(Fi_list):
-    print(i,j)
+# print("*"*30)
+# print("Fi_List:")
+# for i,j in enumerate(Fi_list):
+#     print(i,j)
+
+models = {mobilenet,resnet18,resnet50}
+

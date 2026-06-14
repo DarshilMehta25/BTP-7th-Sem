@@ -2,13 +2,15 @@ import numpy as np
 #Server Resource Algorithm
 
 # we can like hardcode cnn model
+#Single Model
 Fi=[20, 30, 40, 50]# flops required per layer
 Oi=[100, 80, 50, 20]#output size after each layer
 Li=len(Fi) - 1 #total number of layers in the CNN model of user/device i
 
 #say device parameters be:
+#for all devices the parameters remain same, we assume all device have same params except model
 fl_i=12 #local computation power
-pi_tx=50 #transmission power
+pi_tx=10e-3 #transmission power
 hi=0.5 #channel coefficient
 sigma2_i=0.6 #noise power
 Ic= 10 ** (-13) #interference
@@ -19,23 +21,12 @@ gamma_i = 0.1
 p_i = 2
 beta_i = 0.8
 
-
-
-
-
-
-
-
-
-
 #the ED compute: partition point di, total delay, wheater deadline satisfies
 def user_response(wi, fi_edge):
     best_partition = -1
     best_delay = float('inf') #infinity
     best_rl = 0
     best_ru = 0
-
-
 
     #we will try every partition layer and then
     for di in range(Li + 1):
@@ -84,7 +75,7 @@ def do_computation(Nx0, W, F):
     Wi_list=[]
     Fi_list=[]
     UxNx0=0
-    deadline=10 #max allowed delay or latency
+    # deadline=10 #max allowed delay or latency
 
     for i in range(Nx0):
         wi_final=0;fi_final=0;pyi_max=float('-inf')

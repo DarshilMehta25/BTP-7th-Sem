@@ -27,25 +27,28 @@ def SRA(NoX: List[ED], W: float, F: float):
 
     for ed in NoX:
        
-       result = SRA_i(ed, W, F, 1e-5, 1e-5)
+     result = SRA_i(ed, W, F, 1e-5, 1e-5)
+     print(ed.id, result)
        
-       if result is None:
+     if result is None:
             continue
        
-       utility, wi, fi = result
+     utility, wi, fi = result
+     print(utility, wi, fi)
 
-       if utility > 0 and wi > 0 and fi > 0:
+     if utility > 0 and wi > 0 and fi > 0:
                 
-            UxNoX += utility
-            Wi_list.append(wi)
-            Fi_list.append(fi)
+          UxNoX += utility
+          Wi_list.append(wi)
+          Fi_list.append(fi)
                 
-            W = wi
-            F -= fi
+          W -= wi
+          F -= fi
         
-       else:
-            Wi_list.append(0.0)
-            Fi_list.append(0.0)
+     else:
+
+          Wi_list.append(0.0)
+          Fi_list.append(0.0)
 
         # local_delay = ed.local_inference_time()/ed.local_comp_res
         # C_i_0 = (  #eqn (8)
