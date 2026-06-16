@@ -27,14 +27,14 @@ def SRA(NoX: List[ED], W: float, F: float):
 
     for ed in NoX:
        
-     result = SRA_i(ed, W, F, 1e-5, 1e-5)
-     print(ed.id, result)
+     result = SRA_i(ed, W, F)
+     # print(ed.id, result)
        
      if result is None:
             continue
        
      utility, wi, fi = result
-     print(utility, wi, fi)
+     # print(utility, wi, fi)
 
      if utility > 0 and wi > 0 and fi > 0:
                 

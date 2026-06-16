@@ -1,4 +1,4 @@
-from random import randint
+from random import randint,uniform,randrange
 from Classes.ED import ED
 import numpy as np
 from Classes.Model import Layers, Model
@@ -13,12 +13,12 @@ from SingletonUM import SUM
 
 def layer(a:int):
 
-    oi = [randint(10,50) for _ in range(0,a)] #Output data size of each layer in MBs
+    oi = [(randrange(1,150)/1000) for _ in range(0,a)] #Output data size of each layer in MBs
     oi.sort()
     oi.reverse()
     np.array(oi)
 
-    fi = [randint(50,150) for _ in range (0,a)] #FLOPs
+    fi = [randrange(1000, 1000000) for _ in range (0,a)] #FLOPs
     fi.sort()
     fi.reverse()
     np.array(fi)
@@ -83,3 +83,22 @@ def layer(a:int):
 # print(total_utility)
 # for device in offloaders:
 #     print(device.id)
+
+# import torch
+# import torchvision.models as models
+# from ptflops import get_model_complexity_info
+
+# Setup a baseline model from the paper's list (e.g., ResNet18)
+# model = models.resnet18(num_classes=10)
+# Modify the first layer to accept grayscale MNIST input (1 channel instead of 3)
+# model.conv1 = torch.nn.Conv2d(1, 64, kernel_size=7, stride=2, padding=3, bias=False)
+
+# Profile layer-by-layer to generate the arrays Fi and Oi
+# with torch.no_grad():
+    # Run the model or utilize a framework profiler 
+    # with an input size of (1, 28, 28)
+    # macs, params = get_model_complexity_info(model, (1, 28, 28), as_strings=False,
+    #                                          print_per_layer_stat=True, verbose=True)
+    # Note: FLOPs are typically approximated as 2 * MACs
+
+# print(macs,params)

@@ -119,7 +119,7 @@ EDs = [
 
     # MobileNet users
     ED(
-        local_comp_res=12,
+        local_comp_res=12e9,
         model=mobilenet,
         task_deadline=5,
         # local_computation_power=2,
@@ -130,7 +130,7 @@ EDs = [
     ),
 
     ED(
-        local_comp_res=10,
+        local_comp_res=10e9,
         model=mobilenet,
         task_deadline=2,
         # local_computation_power=2,
@@ -141,7 +141,7 @@ EDs = [
     ),
 
     ED(
-        local_comp_res=13,
+        local_comp_res=13e9,
         model=mobilenet,
         task_deadline=4,
         # local_computation_power=3,
@@ -152,7 +152,7 @@ EDs = [
     ),
 
     ED(
-        local_comp_res=10,
+        local_comp_res=10e9,
         model=resnet18,
         task_deadline=1,
         # local_computation_power=3,
@@ -163,7 +163,7 @@ EDs = [
     ),
 
     ED(
-        local_comp_res=15,
+        local_comp_res=15e9,
         model=mobilenet,
         task_deadline=6,
         # local_computation_power=4,
@@ -174,7 +174,7 @@ EDs = [
     ),
 
     ED(
-        local_comp_res=10,
+        local_comp_res=10e9,
         model=resnet50,
         task_deadline=6,
         # local_computation_power=5,

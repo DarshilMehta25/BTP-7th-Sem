@@ -10,7 +10,7 @@ from MUMS import MUMS
 #         print(i.id)
 
 if __name__ == "__main__" :
-    X, NxO, UxNxO = MUMS(EDs, models, 20e6, 800e9, 1024)
+    X, NxO, UxNxO = MUMS(EDs, models, 20, 800, 1024)
     for i in X:
         print(i.name, " ", i.storage, " ", i.layers)
     for i in NxO:

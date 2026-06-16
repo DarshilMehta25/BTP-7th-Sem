@@ -9,11 +9,11 @@ class ED:
 
     local_comp_res: int #computation resources FLOPS #fli
     model: Model #Xi
-    task_deadline: int #in seconds #ti
+    task_deadline: int #in  milli seconds #ti
     channel_coefficient: float #hi
     transmission_power: float #pi
     energy_consumption_param: float #kil
-    transmision_antenna_power_eff_param: float #Bi
+    transmision_antenna_power_eff_param: float #Bi #in milli watts
 
     ed_counter: int = 0
     
