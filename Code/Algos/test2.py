@@ -1,9 +1,18 @@
+<<<<<<< HEAD
 from Algos.Classes.ED import ED
 from Algos.Classes.Model import Model
 from Algos.test import layer
 import numpy as np
 from Algos.ServerRA import SRA
 from Algos.ServerRA_i import SRA_i
+=======
+from Classes.ED import ED
+from Classes.Model import Model
+from test import layer
+import numpy as np
+from ServerRA import SRA
+from ServerRA_i import SRA_i
+>>>>>>> 57098279b8d8c16bd1b326f527733df340d21a7e
 
 mobilenet = Model(
     name="MobileNet",

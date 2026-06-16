@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 from Algos.Classes.ED import ED
+=======
+from Classes.ED import ED
+>>>>>>> 57098279b8d8c16bd1b326f527733df340d21a7e
 import numpy as np
 
 #Server Resource Allocation fir Each Device
