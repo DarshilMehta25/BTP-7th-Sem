@@ -1,4 +1,5 @@
 from Classes.ED import ED
+from Classes.ED import ED
 import numpy as np
 
 #Server Resource Allocation fir Each Device

@@ -2,10 +2,16 @@ from Classes.ED import ED
 import numpy as np
 from typing import List
 from ServerRA_i import SRA_i
+from Classes.ED import ED
+import numpy as np
+from typing import List
+from ServerRA_i import SRA_i
 
 #Server Resource Allocation
 
 def SRA(NoX: List[ED], W: float, F: float):
+
+    how_many_get_res=0
 
     UxNoX: float = 0
     Wi_list: list[float] = []
@@ -44,7 +50,8 @@ def SRA(NoX: List[ED], W: float, F: float):
                 
           W -= wi
           F -= fi
-        
+          how_many_get_res += 1
+
      else:
 
           Wi_list.append(0.0)
@@ -108,4 +115,5 @@ def SRA(NoX: List[ED], W: float, F: float):
         #     if (pi_max != float('-inf')):
         #         UxNoX += pi_max
 
-    return UxNoX, Wi_list, Fi_list
+    return UxNoX, Wi_list, Fi_list, how_many_get_res
+    # return UxNoX, Wi_list, Fi_list

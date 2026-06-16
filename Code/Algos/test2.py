@@ -2,8 +2,6 @@ from Classes.ED import ED
 from Classes.Model import Model
 from test import layer
 import numpy as np
-from ServerRA import SRA
-from ServerRA_i import SRA_i
 
 mobilenet = Model(
     name="MobileNet",
