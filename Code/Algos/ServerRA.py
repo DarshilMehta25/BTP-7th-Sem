@@ -1,24 +1,18 @@
-<<<<<<< HEAD
 from Algos.Classes.ED import ED
 import numpy as np
 from typing import List
 from Algos.ServerRA_i import SRA_i
-=======
-from Classes.ED import ED
+from Algos.Classes.ED import ED
 import numpy as np
 from typing import List
-from ServerRA_i import SRA_i
->>>>>>> 57098279b8d8c16bd1b326f527733df340d21a7e
+from Algos.ServerRA_i import SRA_i
 
 #Server Resource Allocation
 
 def SRA(NoX: List[ED], W: float, F: float):
 
-<<<<<<< HEAD
     how_many_get_res=0
 
-=======
->>>>>>> 57098279b8d8c16bd1b326f527733df340d21a7e
     UxNoX: float = 0
     Wi_list: list[float] = []
     Fi_list: list[float] = []
@@ -39,23 +33,17 @@ def SRA(NoX: List[ED], W: float, F: float):
 
     for ed in NoX:
        
-<<<<<<< HEAD
      result = SRA_i(ed, W, F)
      # print(ed.id, result)
-=======
-     result = SRA_i(ed, W, F, 1e-5, 1e-5)
-     print(ed.id, result)
->>>>>>> 57098279b8d8c16bd1b326f527733df340d21a7e
-       
+     # result = SRA_i(ed, W, F, 1e-5, 1e-5)
+     # print(ed.id, result)
+
      if result is None:
             continue
        
      utility, wi, fi = result
-<<<<<<< HEAD
      # print(utility, wi, fi)
-=======
-     print(utility, wi, fi)
->>>>>>> 57098279b8d8c16bd1b326f527733df340d21a7e
+     # print(utility, wi, fi)
 
      if utility > 0 and wi > 0 and fi > 0:
                 
@@ -65,11 +53,8 @@ def SRA(NoX: List[ED], W: float, F: float):
                 
           W -= wi
           F -= fi
-<<<<<<< HEAD
           how_many_get_res += 1
-=======
->>>>>>> 57098279b8d8c16bd1b326f527733df340d21a7e
-        
+
      else:
 
           Wi_list.append(0.0)
@@ -133,8 +118,5 @@ def SRA(NoX: List[ED], W: float, F: float):
         #     if (pi_max != float('-inf')):
         #         UxNoX += pi_max
 
-<<<<<<< HEAD
     return UxNoX, Wi_list, Fi_list, how_many_get_res
-=======
-    return UxNoX, Wi_list, Fi_list
->>>>>>> 57098279b8d8c16bd1b326f527733df340d21a7e
+    # return UxNoX, Wi_list, Fi_list

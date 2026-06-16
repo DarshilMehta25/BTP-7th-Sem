@@ -1,12 +1,9 @@
-<<<<<<< HEAD
 from Algos.Classes.ED import ED
 from typing import List
 from Algos.ServerRA_i import SRA_i
-=======
-from Classes.ED import ED
+from Algos.Classes.ED import ED
 from typing import List
-from ServerRA_i import SRA_i
->>>>>>> 57098279b8d8c16bd1b326f527733df340d21a7e
+from Algos.ServerRA_i import SRA_i
 
 #Singleton Utility Maximization
 def SUM(Nx: List[ED], W:float, F: float):

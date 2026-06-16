@@ -1,17 +1,10 @@
 #Model Utility Maximization Algorithm
 
 import numpy as np
-<<<<<<< HEAD
 from Algos.Classes.Model import Model
 from Algos.Classes.ED import ED
 from typing import List, Set
 from Algos.SingletonUM import SUM
-=======
-from Classes.Model import Model
-from Classes.ED import ED
-from typing import List, Set
-from SingletonUM import SUM
->>>>>>> 57098279b8d8c16bd1b326f527733df340d21a7e
 
 def utilized_storage(X: Set[Model]) -> float: #total storage utilized by cached models
 

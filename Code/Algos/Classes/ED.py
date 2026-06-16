@@ -1,9 +1,6 @@
 from dataclasses import dataclass
-<<<<<<< HEAD
 from Algos.Classes.Model import Model
-=======
 from .Model import Model
->>>>>>> 57098279b8d8c16bd1b326f527733df340d21a7e
 import numpy as np
 
 Ic = 10**(-13) #defined gloabally, average channel coherance time
