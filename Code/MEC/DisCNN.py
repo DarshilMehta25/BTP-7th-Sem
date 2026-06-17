@@ -1,30 +1,235 @@
-#How to run algos?
+import sys
+import os
+import matplotlib.pyplot as plt
+import copy, time
 
-#Makes instances of ESP, Edge Server
-#Populate List of J, N
-#Call MUMS from ESP
-#Call SUM and pass the value of MUMS
-#Call SRA and pass the value of SUM
+current_dir = os.path.dirname(os.path.abspath(__file__))
+project_root = os.path.dirname(current_dir)
 
-#To simulate inference delay on edge server and ED, call methods simluate delay on both 
+# Add the root to sys.path
+if project_root not in sys.path:
+    sys.path.append(project_root)
 
-# Graph kese banayenge?
-# List mein 50 ED banake dal denge
-# Fir uska sublist 10 ke steps matlab pehla first 10 baad me append karke karke next 10, ese....
-# Fir uske corresponding upar ka flow chalega har ek loop ke iteration mein
+from J import J
+from N import EDs, EDs_SUM
+from Algos.Classes.EdgeServer import EdgeServer
+from Algos.Classes.ESP import ESP
 
-# Figure (a), (c) and (e) of Figure 3,4,5
-# Total 9
-# Algorithm Runtime time module (e)
+server = [EdgeServer(20, 800, 1024)]
+esp = ESP(servers=server)
 
-#List mein se kitno ko reource mile usko N me se subtract kardenge (c)
-# Upar ka task Monday, Tuesday ka hain
-# Graph ke lie alag se file banana
+eds = EDs
+offloaders = EDs_SUM
 
-# Utility
 
-# Darshil
-# Debug and find out issue with utility
+# results = esp.MUMS(EDs, J, 20, 800, 1024)
+# results = esp.SUM(EDs_SUM,20, 800)
+# results = esp.SRA(EDs, 20, 800)
 
-# Harsh
-# Graph part with integration
+# MUMS
+# X = results[0] 
+# Offl = results[1] #SUM
+# Utility = results[2] #SUM
+ 
+# SRA
+# Wi_l = results[1]
+# Fi_l = results[2]
+# no_of_offl = results[3]
+# Utility = results[0]
+
+# for models in X:
+#     print(models.name)
+
+# for devices in Offl:
+#     print(devices.id)
+
+# print(*Wi_l)
+# print(*Fi_l)
+# print(no_of_offl)
+# print(Utility)
+
+x_values1 = []
+y_values1 = []
+y_values2 = []
+y_values3 = []
+successful_offloaders_mums = []
+successful_offloaders_sra = []
+successful_offloaders_sum = []
+
+time_of_MUMS_execution=[]
+time_of_SRA_execution=[]
+time_of_SUM_execution=[]
+
+def DisCNN():
+    for i in range(0, len(EDs) + 1, 10):
+        curr_EDs = copy.deepcopy(EDs[:i])
+        curr_EDs_SUM = copy.deepcopy(EDs_SUM[:i])
+        curr_models = copy.deepcopy(J)
+
+
+        start1=time.time()
+        _, Nx01, UxNxO_mums=esp.MUMS(curr_EDs,curr_models,20,800,1024)
+        finish1=time.time()
+
+        start2 = time.time()
+        UxNoX_sra, _, _, Nx02 = esp.SRA(curr_EDs,20,800)
+        finish2 = time.time()
+
+        start3=time.time()
+        UxSUM, Nx03 = esp.SUM(curr_EDs_SUM,20,800)
+        finish3=time.time()
+
+        # print(f"{i} EDs -> Utility: {UxNxO}")
+        x_values1.append(i)
+        y_values1.append(UxNxO_mums) #utility from MUMS
+        y_values2.append(UxNoX_sra) #utility from SRA
+        y_values3.append(UxSUM) #utility from SUM
+        time_of_MUMS_execution.append(finish1-start1)
+        time_of_SRA_execution.append(finish2-start2)
+        time_of_SUM_execution.append(finish3-start3)
+        successful_offloaders_mums.append(len(Nx01))
+        successful_offloaders_sra.append(Nx02)
+        successful_offloaders_sum.append(len(Nx03))
+
+    fig, axs = plt.subplots(3, 1, figsize=(8, 12))
+
+    # MUMS
+    axs[0].plot(x_values1, y_values1)
+    axs[0].set_title("Dis CNN")
+    axs[0].set_xlabel("Number of EDs")
+    axs[0].set_ylabel("Max Total Utility")
+    axs[0].set_xticks(x_values1)
+
+    # SRA
+    axs[1].plot(x_values1, y_values2)
+    axs[1].set_title("SRA")
+    axs[1].set_xlabel("Offloaders")
+    axs[1].set_ylabel("Max Total Utility")
+    axs[1].set_xticks(x_values1)
+
+    # SUM
+    axs[2].plot(x_values1, y_values3)
+    axs[2].set_title("SUM")
+    axs[2].set_xlabel("Number of EDs")
+    axs[2].set_ylabel("Max Total Utility")
+    axs[2].set_xticks(x_values1)
+
+    plt.tight_layout()
+    plt.savefig("./Results/Max_Total_Utility.png")
+    # plt.show()
+
+    """
+
+    Issue: MUMS() was modifying the original EDs or models objects. Since Python passes objects by reference, changes made in the first call remained for later calls.
+
+    So:
+
+    MUMS(first 2 EDs)  # modifies objects
+    MUMS(first 4 EDs)  # uses already modified objects → utility becomes 0
+
+    How deepcopy fixed it:
+
+    curr_EDs = copy.deepcopy(no_of_offloaders[:i])
+    curr_models = copy.deepcopy(models)
+
+    deepcopy creates completely new independent objects, so each call to MUMS() starts with fresh data and cannot affect later calls.
+
+    """
+
+
+
+    # print("x =", x_values1)
+    # print("y =", y_values1)
+
+    # print(*x_values1)
+    # print(*y_values1)
+
+    # plt.plot(x_values1, y_values1)
+    # plt.xlabel("Number of Offloaders")
+    # plt.ylabel("Max Total Utility")
+    # plt.title("Number of Offloaders vs Max Total Utility")
+    # plt.savefig("no_of_offloadersVSmax_total_utility.png")
+
+
+
+    #Number of offloaders vs Total Energy Consumption
+
+
+
+
+
+    #Number of Offloaders vs Successful Offloaders
+    fig, axs = plt.subplots(3, 1, figsize=(8, 12))
+
+    # MUMS
+    axs[0].plot(x_values1, successful_offloaders_mums)
+    axs[0].set_title("MUMS")
+    axs[0].set_xlabel("Number of EDs")
+    axs[0].set_ylabel("Successful Offloaders")
+    axs[0].set_xticks(x_values1)
+    axs[0].grid(True)
+
+    # SRA
+    axs[1].plot(x_values1, successful_offloaders_sra)
+    axs[1].set_title("SRA")
+    axs[1].set_xlabel("Offloaders")
+    axs[1].set_ylabel("Successful Offloaders")
+    axs[1].set_xticks(x_values1)
+    axs[1].grid(True)
+
+    # SUM
+    axs[2].plot(x_values1, successful_offloaders_sum)
+    axs[2].set_title("SUM")
+    axs[2].set_xlabel("Number of EDs")
+    axs[2].set_ylabel("Successful Offloaders")
+    axs[2].set_xticks(x_values1)
+    axs[2].grid(True)
+
+    plt.tight_layout()
+    plt.savefig("./Results/Successful_Offloaders.png", dpi=300)
+    # plt.show()
+
+
+    # for i in successful_offloaders:
+    #     print(len(i))
+    #Number of Offloaders vs Average Inference Delay
+
+
+
+    #Number of Offloaders vs Average Execution Time
+
+    fig, axs = plt.subplots(3, 1, figsize=(8, 12))
+
+    # MUMS
+    axs[0].plot(x_values1, time_of_MUMS_execution,
+                marker='o')
+    axs[0].set_title("MUMS")
+    axs[0].set_xlabel("Number of EDs")
+    axs[0].set_ylabel("Average Execution Time (s)")
+    axs[0].set_xticks(x_values1)
+    axs[0].grid(True)
+
+    # SRA
+    axs[1].plot(x_values1, time_of_SRA_execution,
+                marker='s')
+    axs[1].set_title("SRA")
+    axs[1].set_xlabel("Number of Offloaders")
+    axs[1].set_ylabel("Average Execution Time (s)")
+    axs[1].set_xticks(x_values1)
+    axs[1].grid(True)
+
+    # SUM
+    axs[2].plot(x_values1, time_of_SUM_execution,
+                marker='^')
+    axs[2].set_title("SUM")
+    axs[2].set_xlabel("Number of EDs")
+    axs[2].set_ylabel("Average Execution Time (s)")
+    axs[2].set_xticks(x_values1)
+    axs[2].grid(True)
+
+    plt.tight_layout()
+    plt.savefig("./Results/Avg_Execution_Time.png", dpi=300)
+    # plt.show()
+    plt.close()
+
+DisCNN()

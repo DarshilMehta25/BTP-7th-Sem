@@ -26,7 +26,7 @@ def maxutil(EDs: List[ED], J: Set[Model], W: float, F: float) -> Model: #utility
     
     if(utility_to_size != dict()): return max(utility_to_size, key=utility_to_size.get)
 
-def MUMS(EDs: List[ED], J: set, W: float, F: float, S: int): 
+def MUMS(EDs: List[ED], J: List[Model], W: float, F: float, S: int): 
 
     X: Set[Model] = set() #set of cached models
     # Ux: int = 0 #utility gained by caching models X
@@ -41,7 +41,8 @@ def MUMS(EDs: List[ED], J: set, W: float, F: float, S: int):
 
         if(S>= utilized_storage((X.union({j_})))): X.add(j_)
 
-        J.discard(j_)
+        # J.discard(j_)
+        J.remove(j_)
     
     
     for model in X:

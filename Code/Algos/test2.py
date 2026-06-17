@@ -1,28 +1,86 @@
 from Classes.ED import ED
-from Classes.Model import Model
-from test import layer
+from Classes.Model import Model, Layers
+# from test import layer
 import numpy as np
+import random
+
+# Wi_list=[]
+# Fi_list=[]
+
+def layer(a:int):
+
+    oi = [(random.randrange(1,150)/1000) for _ in range(0,a)] #Output data size of each layer in MBs
+    oi.sort()
+    oi.reverse()
+    np.array(oi)
+
+    fi = [random.randrange(1000, 1000000) for _ in range (0,a)] #FLOPs
+    fi.sort()
+    fi.reverse()
+    np.array(fi)
+
+    return Layers(oi,fi)
 
 mobilenet = Model(
     name="MobileNet",
-    storage=250,  # MB
-    layers= layer(5)
+    storage=40,
+    layers= layer(27)
 )
 
 resnet18 = Model(
     name="Resnet18",
-    storage=350,
+    storage=35,
     layers=layer(18)
 )
 
 resnet50 = Model(
     name="Resnet50",
-    storage=550,
+    storage=100,
     layers=layer(50)
 )
 
-# Wi_list=[]
-# Fi_list=[]
+resnet34 = Model(
+    name="Resnet34",
+    storage=50,
+    layers=layer(50)
+)
+
+vgg16 = Model(
+    name="VGG16",
+    storage=150,
+    layers=layer(16)
+)
+
+vgg19 = Model(
+    name="VGG19",
+    storage=180,
+    layers=layer(19)
+)
+
+inceptionv3 = Model(
+    name="Inceptionv3",
+    storage=110,
+    layers= layer(23)
+)
+
+googlenet = Model(
+    name="GoogleNet",
+    storage=25,
+    layers= layer(27)
+)
+
+alexnet = Model(
+    name="AlexNet",
+    storage=65,
+    layers= layer(5)
+)
+
+densenet = Model(
+    name="DenseNet",
+    storage=135,
+    layers=layer(121)
+)
+
 
 # UxNoX: float = 0
 # g = 0.1
@@ -151,7 +209,7 @@ EDs = [
 
     ED(
         local_comp_res=10e9,
-        model=resnet18,
+        model=mobilenet,
         task_deadline=1,
         # local_computation_power=3,
         channel_coefficient=0.75,
@@ -173,7 +231,7 @@ EDs = [
 
     ED(
         local_comp_res=10e9,
-        model=resnet50,
+        model=mobilenet,
         task_deadline=6,
         # local_computation_power=5,
         channel_coefficient=1,
@@ -182,6 +240,24 @@ EDs = [
         transmision_antenna_power_eff_param=0.90
     )
 ]
+
+# for _ in range(44):
+#     new_ed = ED(
+#         local_comp_res=random.uniform(10, 15) * 1e9,               # Unif[10, 15] GFLOPS
+#         model=mobilenet,                                           # strictly mobilenet
+#         task_deadline=random.uniform(3, 6),                        # Unif[3, 6] s
+#         channel_coefficient=random.uniform(0.1, 1.0),              # Unif[0.1, 1]
+#         transmission_power=random.uniform(10, 100) * 1e-3,         # Unif[10, 100] mW
+#         energy_consumption_param=random.uniform(0.1, 1.0),         # Unif[0.1, 1]
+#         transmision_antenna_power_eff_param=random.uniform(0.5, 1.0) # Unif[0.5, 1]
+#     )
+#     EDs_SUM.append(new_ed)
+
+# print(len(EDs_SUM))
+
+models= [mobilenet,resnet18,resnet34,resnet50,alexnet,googlenet,inceptionv3,vgg16,vgg19,densenet]
+
+
 
 # for ed in EDs:
 #     print(SRA_i(ed,20e6, 800e9))
@@ -202,5 +278,4 @@ EDs = [
 # for i,j in enumerate(Fi_list):
 #     print(i,j)
 
-models = {mobilenet,resnet18,resnet50}
 

@@ -12,19 +12,7 @@ from SingletonUM import SUM
 #storage is assumed to be in MBs
 #computation resources for ED defined in MHz FLOPS
 
-def layer(a:int):
 
-    oi = [(randrange(1,150)/1000) for _ in range(0,a)] #Output data size of each layer in MBs
-    oi.sort()
-    oi.reverse()
-    np.array(oi)
-
-    fi = [randrange(1000, 1000000) for _ in range (0,a)] #FLOPs
-    fi.sort()
-    fi.reverse()
-    np.array(fi)
-
-    return Layers(oi,fi)
 
 # print(lm1)
 # print(cm1)

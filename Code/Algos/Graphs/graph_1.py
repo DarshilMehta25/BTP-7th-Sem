@@ -1,21 +1,27 @@
 import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
-from ServerRA_i import SRA_i
+# from ServerRA_i import SRA_i
+
+import sys,os
+parent_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+# print(parent_dir)
+sys.path.append(parent_dir)
+
 from SingletonUM import SUM
 from ServerRA import SRA
 
 
-x_values = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15]
-y_values = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15]
+# x_values = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15]
+# y_values = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15]
 
 # plt.plot(x_values, y_values)
 # plt.savefig("graph.png")
 
 
 
-from Algos import test2, MUMS
-from Algos import MUMS
+import test2, MUMS
+import MUMS
 no_of_offloaders=test2.EDs
 models=test2.models
 
@@ -44,7 +50,7 @@ time_of_SUM_execution=[]
 #     x_values1.append(i)
 #     y_values1.append(UxNxO)
 
-import copy
+# import copy
 
 import copy
 import time
@@ -56,11 +62,11 @@ for i in range(2, len(no_of_offloaders) + 1, 2):
 
 
     start1=time.time()
-    X, Nx01, UxNxO_mums=MUMS.MUMS(curr_EDs,curr_models,20e6,800e9,2000)
+    X, Nx01, UxNxO_mums=MUMS.MUMS(curr_EDs,curr_models,20,800,2000)
     finish1=time.time()
 
     start2 = time.time()
-    UxNoX_sra, Wi_list, Fi_list, Nx02=SRA(curr_EDs,20e6,800e9)
+    UxNoX_sra, Wi_list, Fi_list, Nx02=SRA(curr_EDs,20,800)
     finish2 = time.time()
 
     start3=time.time()
@@ -91,7 +97,7 @@ axs[0].set_xticks(x_values1)
 # SRA
 axs[1].plot(x_values1, y_values2)
 axs[1].set_title("SRA")
-axs[1].set_xlabel("Number of EDs")
+axs[1].set_xlabel("Offloaders")
 axs[1].set_ylabel("Max Total Utility")
 axs[1].set_xticks(x_values1)
 
@@ -159,7 +165,7 @@ axs[0].grid(True)
 # SRA
 axs[1].plot(x_values1, successful_offloaders_sra)
 axs[1].set_title("SRA")
-axs[1].set_xlabel("Number of EDs")
+axs[1].set_xlabel("Offloaders")
 axs[1].set_ylabel("Successful Offloaders")
 axs[1].set_xticks(x_values1)
 axs[1].grid(True)
@@ -190,7 +196,7 @@ fig, axs = plt.subplots(3, 1, figsize=(8, 12))
 axs[0].plot(x_values1, time_of_MUMS_execution,
             marker='o')
 axs[0].set_title("MUMS")
-axs[0].set_xlabel("Number of Offloaders")
+axs[0].set_xlabel("Number of EDs")
 axs[0].set_ylabel("Average Execution Time (s)")
 axs[0].set_xticks(x_values1)
 axs[0].grid(True)
@@ -208,7 +214,7 @@ axs[1].grid(True)
 axs[2].plot(x_values1, time_of_SUM_execution,
             marker='^')
 axs[2].set_title("SUM")
-axs[2].set_xlabel("Number of Offloaders")
+axs[2].set_xlabel("Number of EDs")
 axs[2].set_ylabel("Average Execution Time (s)")
 axs[2].set_xticks(x_values1)
 axs[2].grid(True)
