@@ -16,6 +16,11 @@ class ED:
     energy_consumption_param: float #kil
     transmision_antenna_power_eff_param: float #Bi #in milli watts
 
+    #Server Attributes allocated to ED in case of collaborative inference
+    allocated_wi: float = 0.0
+    allocated_fi: float = 0.0
+    price_paid: float = 0.0  #Acts as marginal utility gain for ESP, So ED knows how much price to be paid to ESP for allocated resources of Edge Server
+
     ed_counter: int = 0
     
     @property
@@ -96,15 +101,10 @@ class ED:
                     best_rl = rl
                     best_ru = ru
             
-
-
         return best_partition,best_rl, best_ru, ai
 
 
     def simulate_inference_delay(self):
-        pass
-
-    def change_location(self):
         pass
 
     def initiate_handoff(self):

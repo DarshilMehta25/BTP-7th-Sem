@@ -6,7 +6,7 @@ from Classes.ED import ED
 import numpy as np
 from typing import List
 from ServerRA_i import SRA_i
-
+from dataclasses import replace
 #Server Resource Allocation
 
 def SRA(NoX: List[ED], W: float, F: float):
@@ -31,7 +31,7 @@ def SRA(NoX: List[ED], W: float, F: float):
     # f_values=ratios*F
     # print(*f_values)
 
-    for ed in NoX:
+    for idx,ed in enumerate(NoX): #list pe iterate karte samay, loop creates temporary references for each objects, to replace attributes of real objects in list, we have to use list indexing
        
      result = SRA_i(ed, W, F)
      # print(ed.id, result)
@@ -47,6 +47,12 @@ def SRA(NoX: List[ED], W: float, F: float):
           UxNoX += utility
           Wi_list.append(wi)
           Fi_list.append(fi)
+
+          # ed.allocated_wi = wi
+          # ed.allocated_fi = fi
+
+          #Assigning resources to EDs
+          NoX[idx] = replace(ed, allocated_wi = wi, allocated_fi = fi, price_paid = utility) #creating new instance with updated values, replacing new ED instance with old, bcoz attribute of instance are frozen, once assigned can't be changed. Replace function return the class with change attribute values
                 
           W -= wi
           F -= fi

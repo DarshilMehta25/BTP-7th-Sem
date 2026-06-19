@@ -4,6 +4,7 @@ from ServerRA_i import SRA_i
 from Classes.ED import ED
 from typing import List
 from ServerRA_i import SRA_i
+from dataclasses import replace
 
 #Singleton Utility Maximization
 def SUM(Nx: List[ED], W:float, F: float):
@@ -38,10 +39,11 @@ def SUM(Nx: List[ED], W:float, F: float):
         if i_ == -1: #No feasible user
             break
 
-        NxO.append(i_)
-        Nx.remove(i_)
-        UxSUM += selected_utility
+        NxO.append(i_) #Append to list of actual utility maximizing offloaders
+        Nx.remove(i_) #Remove from list of potential offloaderss
+        UxSUM += selected_utility #Add marginal utility gained
 
+        #Remove server resources which are utilized by ED
         W -= selected_w
         F -= selected_f
 

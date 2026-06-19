@@ -29,20 +29,18 @@ def maxutil(EDs: List[ED], J: Set[Model], W: float, F: float) -> Model: #utility
 def MUMS(EDs: List[ED], J: List[Model], W: float, F: float, S: int): 
 
     X: Set[Model] = set() #set of cached models
-    # Ux: int = 0 #utility gained by caching models X
     Nx: List[ED] = []
 
     while(utilized_storage(X) <= S and J != set()):
 
-        # sj = utilized_storage(X)
         j_ = maxutil(EDs, J, W, F) #Model return kare, single
 
         if (j_ == None): break
 
         if(S>= utilized_storage((X.union({j_})))): X.add(j_)
 
-        # J.discard(j_)
-        J.remove(j_)
+        # J.discard(j_) #If J is set
+        J.remove(j_) #If J is list
     
     
     for model in X:
