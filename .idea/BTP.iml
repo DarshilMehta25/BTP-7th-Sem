@@ -5,6 +5,7 @@
       <sourceFolder url="file://$MODULE_DIR$/Code" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/Code/Algos" isTestSource="false" />
       <excludeFolder url="file://$MODULE_DIR$/.venv" />
+      <excludePattern pattern=".idea" />
     </content>
     <orderEntry type="jdk" jdkName="Python 3.11 (BTP)" jdkType="Python SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
