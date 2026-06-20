@@ -49,8 +49,6 @@ offloaders = EDs_SUM
 # print(no_of_offl)
 # print(Utility)
 
-
-
 def Simulate():
 
     esp = ESP(servers=server)

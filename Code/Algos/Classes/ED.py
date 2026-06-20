@@ -26,18 +26,11 @@ class ED:
     @property
     def id(self) -> int: ED.ed_counter+=1; return ED.ed_counter
 
-    #Coordinates of moving user, dynamically change everytime
-    # @property
-    # def x(self) -> int: self.change_location()[0]
-
-    # @property
-    # def y(self) -> int: self.change_location()[1]
-
-    '''
+    # '''
     #Coordinates of mobile user
-    x: int
-    y: int
-    '''
+    x: float = 0
+    y: float = 0
+    # '''
 
     def local_inference_time(self): #ril
         return sum(self.model.layers.computation_per_layer[:])
@@ -108,4 +101,7 @@ class ED:
         pass
 
     def initiate_handoff(self):
+        pass
+
+    def calculate_distance(self, x, y):
         pass

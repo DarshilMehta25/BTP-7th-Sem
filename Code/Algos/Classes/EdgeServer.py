@@ -6,8 +6,8 @@ class EdgeServer:
     F: int
     Storage: int #in MB
     # noise: float
-    # x: int
-    # y: int
+    x: float #Latitude
+    y: float #Longitude
     coverage_area: float #in meters
 
     def MUA(self):
