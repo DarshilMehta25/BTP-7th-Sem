@@ -2,6 +2,7 @@ from Algos.Classes.EdgeServer import  EdgeServer
 import pandas as pd
 from random import randint
 import math
+from Algos.Classes.ED import ED
 
 #Base file addresses
 edge_server_coords_file_path = "./Dataset/site-optus-melbCBD.csv"
@@ -68,7 +69,9 @@ in_range_user_coords = in_range_user_coords[:20] #list size reduces to number of
 # For using subset of users slice the ED list
 # Make ED instances here from ED class
 # ED ke instance idhar banadena as per requirement jo bhi attribute dalne ho dal dena abhi coordinates change karne se kaam hain
+# This function does not return any value just change user coordinates
+# Replace function use karke ED ko har ek baar pura replicate kar na hoga cuz attributes once defined are freezed
 
-def RandomDirectionModel():
+def RandomDirectionModel(ed: ED):
     pass
 
