@@ -1,5 +1,5 @@
-from .EdgeServer import EdgeServer
-from .ED import ED 
+from Classes.EdgeServer import EdgeServer
+from Classes.ED import ED
 from typing import List
 
 import os,sys

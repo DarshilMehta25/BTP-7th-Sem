@@ -1,16 +1,16 @@
 import os,sys
 
-current_dir = os.path.dirname(os.path.abspath(__file__))
+# current_dir = os.path.dirname(os.path.abspath(__file__))
 # print(current_dir)
-project_root = os.path.dirname(current_dir)
+# project_root = os.path.dirname(current_dir)
 # print(project_root)
-if project_root not in sys.path:
-    sys.path.append(project_root)
+# if project_root not in sys.path:
+    # sys.path.append(project_root)
 # print(sys.path)
 
 from Algos.Classes.ED import ED
 import random
-from J import J
+from MEC.J import J
 
 #File contains ED to simulate Collaborative inference
 

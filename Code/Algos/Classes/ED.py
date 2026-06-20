@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 # from Model import Model
-from .Model import Model
+from Classes.Model import Model
 import numpy as np
 
 Ic = 10**(-13) #defined gloabally, average channel coherance time

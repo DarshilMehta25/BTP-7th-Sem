@@ -5,19 +5,19 @@ matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import copy, time
 
-current_dir = os.path.dirname(os.path.abspath(__file__))
-project_root = os.path.dirname(current_dir)
+# current_dir = os.path.dirname(os.path.abspath(__file__))
+# project_root = os.path.dirname(current_dir)
+#
+# # Add the root to sys.path
+# if project_root not in sys.path:
+#     sys.path.append(project_root)
 
-# Add the root to sys.path
-if project_root not in sys.path:
-    sys.path.append(project_root)
-
-from J import J
-from N import EDs, EDs_SUM
+from MEC.J import J
+from MEC.N import EDs, EDs_SUM
 from Algos.Classes.EdgeServer import EdgeServer
 from Algos.Classes.ESP import ESP, ED
 
-server = [EdgeServer(20, 800, 1024)]
+server = [EdgeServer(20, 800, 1024, 500)]
 
 eds = EDs
 offloaders = EDs_SUM
@@ -263,4 +263,4 @@ def DisCNN():
     print(*NxO)
 
 # Simulate() #For Simulation
-# DisCNN() #For actual Model Caching and Resource Allocation
+DisCNN() #For actual Model Caching and Resource Allocation

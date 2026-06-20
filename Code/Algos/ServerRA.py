@@ -1,11 +1,11 @@
-from Classes.ED import ED
+from Algos.Classes.ED import ED
 import numpy as np
 from typing import List
-from ServerRA_i import SRA_i
-from Classes.ED import ED
+from Algos.ServerRA_i import SRA_i
+from Algos.Classes.ED import ED
 import numpy as np
 from typing import List
-from ServerRA_i import SRA_i
+from Algos.ServerRA_i import SRA_i
 from dataclasses import replace
 #Server Resource Allocation
 
