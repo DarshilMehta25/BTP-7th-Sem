@@ -1,0 +1,301 @@
+Index: Code/MEC/DisCNN.py
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>import sys\r\nimport os\r\nimport matplotlib.pyplot as plt\r\nimport copy, time\r\n\r\ncurrent_dir = os.path.dirname(os.path.abspath(__file__))\r\nproject_root = os.path.dirname(current_dir)\r\n\r\n# Add the root to sys.path\r\nif project_root not in sys.path:\r\n    sys.path.append(project_root)\r\n\r\nfrom J import J\r\nfrom N import EDs, EDs_SUM\r\nfrom Algos.Classes.EdgeServer import EdgeServer\r\nfrom Algos.Classes.ESP import ESP\r\n\r\nserver = [EdgeServer(20, 800, 1024)]\r\nesp = ESP(servers=server)\r\n\r\neds = EDs\r\noffloaders = EDs_SUM\r\n\r\n\r\n# results = esp.MUMS(EDs, J, 20, 800, 1024)\r\n# results = esp.SUM(EDs_SUM,20, 800)\r\n# results = esp.SRA(EDs, 20, 800)\r\n\r\n# MUMS\r\n# X = results[0] \r\n# Offl = results[1] #SUM\r\n# Utility = results[2] #SUM\r\n \r\n# SRA\r\n# Wi_l = results[1]\r\n# Fi_l = results[2]\r\n# no_of_offl = results[3]\r\n# Utility = results[0]\r\n\r\n# for models in X:\r\n#     print(models.name)\r\n\r\n# for devices in Offl:\r\n#     print(devices.id)\r\n\r\n# print(*Wi_l)\r\n# print(*Fi_l)\r\n# print(no_of_offl)\r\n# print(Utility)\r\n\r\nx_values1 = []\r\ny_values1 = []\r\ny_values2 = []\r\ny_values3 = []\r\nsuccessful_offloaders_mums = []\r\nsuccessful_offloaders_sra = []\r\nsuccessful_offloaders_sum = []\r\n\r\ntime_of_MUMS_execution=[]\r\ntime_of_SRA_execution=[]\r\ntime_of_SUM_execution=[]\r\n\r\ndef DisCNN():\r\n    for i in range(0, len(EDs) + 1, 10):\r\n        curr_EDs = copy.deepcopy(EDs[:i])\r\n        curr_EDs_SUM = copy.deepcopy(EDs_SUM[:i])\r\n        curr_models = copy.deepcopy(J)\r\n\r\n\r\n        start1=time.time()\r\n        _, Nx01, UxNxO_mums=esp.MUMS(curr_EDs,curr_models,20,800,1024)\r\n        finish1=time.time()\r\n\r\n        start2 = time.time()\r\n        UxNoX_sra, _, _, Nx02 = esp.SRA(curr_EDs,20,800)\r\n        finish2 = time.time()\r\n\r\n        start3=time.time()\r\n        UxSUM, Nx03 = esp.SUM(curr_EDs_SUM,20,800)\r\n        finish3=time.time()\r\n\r\n        # print(f\"{i} EDs -> Utility: {UxNxO}\")\r\n        x_values1.append(i)\r\n        y_values1.append(UxNxO_mums) #utility from MUMS\r\n        y_values2.append(UxNoX_sra) #utility from SRA\r\n        y_values3.append(UxSUM) #utility from SUM\r\n        time_of_MUMS_execution.append(finish1-start1)\r\n        time_of_SRA_execution.append(finish2-start2)\r\n        time_of_SUM_execution.append(finish3-start3)\r\n        successful_offloaders_mums.append(len(Nx01))\r\n        successful_offloaders_sra.append(Nx02)\r\n        successful_offloaders_sum.append(len(Nx03))\r\n\r\n    fig, axs = plt.subplots(3, 1, figsize=(8, 12))\r\n\r\n    # MUMS\r\n    axs[0].plot(x_values1, y_values1)\r\n    axs[0].set_title(\"Dis CNN\")\r\n    axs[0].set_xlabel(\"Number of EDs\")\r\n    axs[0].set_ylabel(\"Max Total Utility\")\r\n    axs[0].set_xticks(x_values1)\r\n\r\n    # SRA\r\n    axs[1].plot(x_values1, y_values2)\r\n    axs[1].set_title(\"SRA\")\r\n    axs[1].set_xlabel(\"Offloaders\")\r\n    axs[1].set_ylabel(\"Max Total Utility\")\r\n    axs[1].set_xticks(x_values1)\r\n\r\n    # SUM\r\n    axs[2].plot(x_values1, y_values3)\r\n    axs[2].set_title(\"SUM\")\r\n    axs[2].set_xlabel(\"Number of EDs\")\r\n    axs[2].set_ylabel(\"Max Total Utility\")\r\n    axs[2].set_xticks(x_values1)\r\n\r\n    plt.tight_layout()\r\n    plt.savefig(\"./Results/Max_Total_Utility.png\")\r\n    # plt.show()\r\n\r\n    \"\"\"\r\n\r\n    Issue: MUMS() was modifying the original EDs or models objects. Since Python passes objects by reference, changes made in the first call remained for later calls.\r\n\r\n    So:\r\n\r\n    MUMS(first 2 EDs)  # modifies objects\r\n    MUMS(first 4 EDs)  # uses already modified objects → utility becomes 0\r\n\r\n    How deepcopy fixed it:\r\n\r\n    curr_EDs = copy.deepcopy(no_of_offloaders[:i])\r\n    curr_models = copy.deepcopy(models)\r\n\r\n    deepcopy creates completely new independent objects, so each call to MUMS() starts with fresh data and cannot affect later calls.\r\n\r\n    \"\"\"\r\n\r\n\r\n\r\n    # print(\"x =\", x_values1)\r\n    # print(\"y =\", y_values1)\r\n\r\n    # print(*x_values1)\r\n    # print(*y_values1)\r\n\r\n    # plt.plot(x_values1, y_values1)\r\n    # plt.xlabel(\"Number of Offloaders\")\r\n    # plt.ylabel(\"Max Total Utility\")\r\n    # plt.title(\"Number of Offloaders vs Max Total Utility\")\r\n    # plt.savefig(\"no_of_offloadersVSmax_total_utility.png\")\r\n\r\n\r\n\r\n    #Number of offloaders vs Total Energy Consumption\r\n\r\n\r\n\r\n\r\n\r\n    #Number of Offloaders vs Successful Offloaders\r\n    fig, axs = plt.subplots(3, 1, figsize=(8, 12))\r\n\r\n    # MUMS\r\n    axs[0].plot(x_values1, successful_offloaders_mums)\r\n    axs[0].set_title(\"MUMS\")\r\n    axs[0].set_xlabel(\"Number of EDs\")\r\n    axs[0].set_ylabel(\"Successful Offloaders\")\r\n    axs[0].set_xticks(x_values1)\r\n    axs[0].grid(True)\r\n\r\n    # SRA\r\n    axs[1].plot(x_values1, successful_offloaders_sra)\r\n    axs[1].set_title(\"SRA\")\r\n    axs[1].set_xlabel(\"Offloaders\")\r\n    axs[1].set_ylabel(\"Successful Offloaders\")\r\n    axs[1].set_xticks(x_values1)\r\n    axs[1].grid(True)\r\n\r\n    # SUM\r\n    axs[2].plot(x_values1, successful_offloaders_sum)\r\n    axs[2].set_title(\"SUM\")\r\n    axs[2].set_xlabel(\"Number of EDs\")\r\n    axs[2].set_ylabel(\"Successful Offloaders\")\r\n    axs[2].set_xticks(x_values1)\r\n    axs[2].grid(True)\r\n\r\n    plt.tight_layout()\r\n    plt.savefig(\"./Results/Successful_Offloaders.png\", dpi=300)\r\n    # plt.show()\r\n\r\n\r\n    # for i in successful_offloaders:\r\n    #     print(len(i))\r\n    #Number of Offloaders vs Average Inference Delay\r\n\r\n\r\n\r\n    #Number of Offloaders vs Average Execution Time\r\n\r\n    fig, axs = plt.subplots(3, 1, figsize=(8, 12))\r\n\r\n    # MUMS\r\n    axs[0].plot(x_values1, time_of_MUMS_execution,\r\n                marker='o')\r\n    axs[0].set_title(\"MUMS\")\r\n    axs[0].set_xlabel(\"Number of EDs\")\r\n    axs[0].set_ylabel(\"Average Execution Time (s)\")\r\n    axs[0].set_xticks(x_values1)\r\n    axs[0].grid(True)\r\n\r\n    # SRA\r\n    axs[1].plot(x_values1, time_of_SRA_execution,\r\n                marker='s')\r\n    axs[1].set_title(\"SRA\")\r\n    axs[1].set_xlabel(\"Number of Offloaders\")\r\n    axs[1].set_ylabel(\"Average Execution Time (s)\")\r\n    axs[1].set_xticks(x_values1)\r\n    axs[1].grid(True)\r\n\r\n    # SUM\r\n    axs[2].plot(x_values1, time_of_SUM_execution,\r\n                marker='^')\r\n    axs[2].set_title(\"SUM\")\r\n    axs[2].set_xlabel(\"Number of EDs\")\r\n    axs[2].set_ylabel(\"Average Execution Time (s)\")\r\n    axs[2].set_xticks(x_values1)\r\n    axs[2].grid(True)\r\n\r\n    plt.tight_layout()\r\n    plt.savefig(\"./Results/Avg_Execution_Time.png\", dpi=300)\r\n    # plt.show()\r\n    plt.close()\r\n\r\nDisCNN()
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/Code/MEC/DisCNN.py b/Code/MEC/DisCNN.py
+--- a/Code/MEC/DisCNN.py	(revision 4ebb42851f25c3b1b183665292d5fa610d5d7975)
++++ b/Code/MEC/DisCNN.py	(date 1781689275100)
+@@ -3,6 +3,10 @@
+ import matplotlib.pyplot as plt
+ import copy, time
+ 
++
++import matplotlib
++matplotlib.use('Agg')
++
+ current_dir = os.path.dirname(os.path.abspath(__file__))
+ project_root = os.path.dirname(current_dir)
+ 
+@@ -61,7 +65,7 @@
+ time_of_SUM_execution=[]
+ 
+ def DisCNN():
+-    for i in range(0, len(EDs) + 1, 10):
++    for i in range(0, len(EDs) + 1, 2):
+         curr_EDs = copy.deepcopy(EDs[:i])
+         curr_EDs_SUM = copy.deepcopy(EDs_SUM[:i])
+         curr_models = copy.deepcopy(J)
+@@ -91,32 +95,54 @@
+         successful_offloaders_sra.append(Nx02)
+         successful_offloaders_sum.append(len(Nx03))
+ 
+-    fig, axs = plt.subplots(3, 1, figsize=(8, 12))
++    # fig, axs = plt.subplots(3, 1, figsize=(8, 12))
++    #
++    # # MUMS
++    # axs[0].plot(x_values1, y_values1)
++    # axs[0].set_title("Dis CNN")
++    # axs[0].set_xlabel("Number of EDs")
++    # axs[0].set_ylabel("Max Total Utility")
++    # axs[0].set_xticks(x_values1)
++    #
++    # # SRA
++    # axs[1].plot(x_values1, y_values2)
++    # axs[1].set_title("SRA")
++    # axs[1].set_xlabel("Offloaders")
++    # axs[1].set_ylabel("Max Total Utility")
++    # axs[1].set_xticks(x_values1)
++    #
++    # # SUM
++    # axs[2].plot(x_values1, y_values3)
++    # axs[2].set_title("SUM")
++    # axs[2].set_xlabel("Number of EDs")
++    # axs[2].set_ylabel("Max Total Utility")
++    # axs[2].set_xticks(x_values1)
++    #
++    # plt.tight_layout()
++    # plt.savefig("./Results/Max_Total_Utility.png")
++    # plt.show()
++
++    plt.figure(figsize=(8, 6))
+ 
+-    # MUMS
+-    axs[0].plot(x_values1, y_values1)
+-    axs[0].set_title("Dis CNN")
+-    axs[0].set_xlabel("Number of EDs")
+-    axs[0].set_ylabel("Max Total Utility")
+-    axs[0].set_xticks(x_values1)
++    plt.plot(x_values1, y_values1,
++             marker='o', color='blue', label='Dis CNN')
+ 
+-    # SRA
+-    axs[1].plot(x_values1, y_values2)
+-    axs[1].set_title("SRA")
+-    axs[1].set_xlabel("Offloaders")
+-    axs[1].set_ylabel("Max Total Utility")
+-    axs[1].set_xticks(x_values1)
++    plt.plot(x_values1, y_values2,
++             marker='s', color='red', label='SRA')
+ 
+-    # SUM
+-    axs[2].plot(x_values1, y_values3)
+-    axs[2].set_title("SUM")
+-    axs[2].set_xlabel("Number of EDs")
+-    axs[2].set_ylabel("Max Total Utility")
+-    axs[2].set_xticks(x_values1)
++    plt.plot(x_values1, y_values3,
++             marker='^', color='green', label='SUM')
++
++    plt.title("Number of EDs vs Max Total Utility")
++    plt.xlabel("Number of EDs")
++    plt.ylabel("Max Total Utility")
++    plt.xticks(x_values1)
++
++    plt.legend()
++    plt.grid(True)
+ 
+     plt.tight_layout()
+     plt.savefig("./Results/Max_Total_Utility.png")
+-    # plt.show()
+ 
+     """
+ 
+@@ -159,35 +185,62 @@
+ 
+ 
+     #Number of Offloaders vs Successful Offloaders
+-    fig, axs = plt.subplots(3, 1, figsize=(8, 12))
++    # fig, axs = plt.subplots(3, 1, figsize=(8, 12))
++    #
++    # # MUMS
++    # axs[0].plot(x_values1, successful_offloaders_mums)
++    # axs[0].set_title("MUMS")
++    # axs[0].set_xlabel("Number of EDs")
++    # axs[0].set_ylabel("Successful Offloaders")
++    # axs[0].set_xticks(x_values1)
++    # axs[0].grid(True)
++    #
++    # # SRA
++    # axs[1].plot(x_values1, successful_offloaders_sra)
++    # axs[1].set_title("SRA")
++    # axs[1].set_xlabel("Offloaders")
++    # axs[1].set_ylabel("Successful Offloaders")
++    # axs[1].set_xticks(x_values1)
++    # axs[1].grid(True)
++    #
++    # # SUM
++    # axs[2].plot(x_values1, successful_offloaders_sum)
++    # axs[2].set_title("SUM")
++    # axs[2].set_xlabel("Number of EDs")
++    # axs[2].set_ylabel("Successful Offloaders")
++    # axs[2].set_xticks(x_values1)
++    # axs[2].grid(True)
++    #
++    # plt.tight_layout()
++    # plt.savefig("./Results/Successful_Offloaders.png", dpi=300)
++    # plt.show()
++
++    plt.figure(figsize=(8, 6))
+ 
+     # MUMS
+-    axs[0].plot(x_values1, successful_offloaders_mums)
+-    axs[0].set_title("MUMS")
+-    axs[0].set_xlabel("Number of EDs")
+-    axs[0].set_ylabel("Successful Offloaders")
+-    axs[0].set_xticks(x_values1)
+-    axs[0].grid(True)
++    plt.plot(x_values1, successful_offloaders_mums,
++             marker='o', color='blue', label='MUMS')
+ 
+     # SRA
+-    axs[1].plot(x_values1, successful_offloaders_sra)
+-    axs[1].set_title("SRA")
+-    axs[1].set_xlabel("Offloaders")
+-    axs[1].set_ylabel("Successful Offloaders")
+-    axs[1].set_xticks(x_values1)
+-    axs[1].grid(True)
++    plt.plot(x_values1, successful_offloaders_sra,
++             marker='s', color='red', label='SRA')
+ 
+     # SUM
+-    axs[2].plot(x_values1, successful_offloaders_sum)
+-    axs[2].set_title("SUM")
+-    axs[2].set_xlabel("Number of EDs")
+-    axs[2].set_ylabel("Successful Offloaders")
+-    axs[2].set_xticks(x_values1)
+-    axs[2].grid(True)
++    plt.plot(x_values1, successful_offloaders_sum,
++             marker='^', color='green', label='SUM')
++
++    plt.title("Number of EDs vs Successful Offloaders")
++    plt.xlabel("Number of EDs")
++    plt.ylabel("Successful Offloaders")
++    plt.xticks(x_values1)
++
++    plt.legend()
++    plt.grid(True)
+ 
+     plt.tight_layout()
+     plt.savefig("./Results/Successful_Offloaders.png", dpi=300)
+-    # plt.show()
++
++
+ 
+ 
+     # for i in successful_offloaders:
+@@ -198,38 +251,67 @@
+ 
+     #Number of Offloaders vs Average Execution Time
+ 
+-    fig, axs = plt.subplots(3, 1, figsize=(8, 12))
++    # fig, axs = plt.subplots(3, 1, figsize=(8, 12))
++    #
++    # # MUMS
++    # axs[0].plot(x_values1, time_of_MUMS_execution,
++    #             marker='o')
++    # axs[0].set_title("MUMS")
++    # axs[0].set_xlabel("Number of EDs")
++    # axs[0].set_ylabel("Average Execution Time (s)")
++    # axs[0].set_xticks(x_values1)
++    # axs[0].grid(True)
++    #
++    # # SRA
++    # axs[1].plot(x_values1, time_of_SRA_execution,
++    #             marker='s')
++    # axs[1].set_title("SRA")
++    # axs[1].set_xlabel("Number of Offloaders")
++    # axs[1].set_ylabel("Average Execution Time (s)")
++    # axs[1].set_xticks(x_values1)
++    # axs[1].grid(True)
++    #
++    # # SUM
++    # axs[2].plot(x_values1, time_of_SUM_execution,
++    #             marker='^')
++    # axs[2].set_title("SUM")
++    # axs[2].set_xlabel("Number of EDs")
++    # axs[2].set_ylabel("Average Execution Time (s)")
++    # axs[2].set_xticks(x_values1)
++    # axs[2].grid(True)
++    #
++    # plt.tight_layout()
++    # plt.savefig("./Results/Avg_Execution_Time.png", dpi=300)
++    # # plt.show()
++    # plt.close()
++
++
++
++
++    plt.figure(figsize=(8, 6))
+ 
+     # MUMS
+-    axs[0].plot(x_values1, time_of_MUMS_execution,
+-                marker='o')
+-    axs[0].set_title("MUMS")
+-    axs[0].set_xlabel("Number of EDs")
+-    axs[0].set_ylabel("Average Execution Time (s)")
+-    axs[0].set_xticks(x_values1)
+-    axs[0].grid(True)
++    plt.plot(x_values1, time_of_MUMS_execution,
++             marker='o', color='blue', label='MUMS')
+ 
+     # SRA
+-    axs[1].plot(x_values1, time_of_SRA_execution,
+-                marker='s')
+-    axs[1].set_title("SRA")
+-    axs[1].set_xlabel("Number of Offloaders")
+-    axs[1].set_ylabel("Average Execution Time (s)")
+-    axs[1].set_xticks(x_values1)
+-    axs[1].grid(True)
++    plt.plot(x_values1, time_of_SRA_execution,
++             marker='s', color='red', label='SRA')
+ 
+     # SUM
+-    axs[2].plot(x_values1, time_of_SUM_execution,
+-                marker='^')
+-    axs[2].set_title("SUM")
+-    axs[2].set_xlabel("Number of EDs")
+-    axs[2].set_ylabel("Average Execution Time (s)")
+-    axs[2].set_xticks(x_values1)
+-    axs[2].grid(True)
++    plt.plot(x_values1, time_of_SUM_execution,
++             marker='^', color='green', label='SUM')
++
++    plt.title("Number of EDs vs Average Execution Time")
++    plt.xlabel("Number of EDs")
++    plt.ylabel("Average Execution Time (s)")
++    plt.xticks(x_values1)
++
++    plt.legend()
++    plt.grid(True)
+ 
+     plt.tight_layout()
+     plt.savefig("./Results/Avg_Execution_Time.png", dpi=300)
+-    # plt.show()
+     plt.close()
+ 
+ DisCNN()
+\ No newline at end of file
+Index: Code/Algos/Graphs/graph_1.py
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>import matplotlib\r\nmatplotlib.use('Agg')\r\nimport matplotlib.pyplot as plt\r\n# from ServerRA_i import SRA_i\r\n\r\nimport sys,os\r\nparent_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))\r\n# print(parent_dir)\r\nsys.path.append(parent_dir)\r\n\r\nfrom SingletonUM import SUM\r\nfrom ServerRA import SRA\r\n\r\n\r\n# x_values = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15]\r\n# y_values = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15]\r\n\r\n# plt.plot(x_values, y_values)\r\n# plt.savefig(\"graph.png\")\r\n\r\n\r\n\r\nimport test2, MUMS\r\nimport MUMS\r\nno_of_offloaders=test2.EDs\r\nmodels=test2.models\r\n\r\n\r\n#Number of Offloaders vs Max Total Utility\r\nx_values1 = []\r\ny_values1 = []\r\ny_values2 = []\r\ny_values3 = []\r\nsuccessful_offloaders_mums = []\r\nsuccessful_offloaders_sra = []\r\nsuccessful_offloaders_sum = []\r\n\r\ntime_of_MUMS_execution=[]\r\ntime_of_SRA_execution=[]\r\ntime_of_SUM_execution=[]\r\n\r\n\r\n\r\n# for i in range(2, len(no_of_offloaders) + 1, 2):\r\n#\r\n#     curr_EDs = no_of_offloaders[:4]\r\n#     X, NxO, UxNxO = MUMS.MUMS(curr_EDs, models, 20e6, 800e9, 2000)\r\n#\r\n#     print(\"Utility:\", UxNxO)\r\n#     x_values1.append(i)\r\n#     y_values1.append(UxNxO)\r\n\r\n# import copy\r\n\r\nimport copy\r\nimport time\r\n\r\n\r\nfor i in range(2, len(no_of_offloaders) + 1, 2):\r\n    curr_EDs = copy.deepcopy(no_of_offloaders[:i])\r\n    curr_models = copy.deepcopy(models)\r\n\r\n\r\n    start1=time.time()\r\n    X, Nx01, UxNxO_mums=MUMS.MUMS(curr_EDs,curr_models,20,800,2000)\r\n    finish1=time.time()\r\n\r\n    start2 = time.time()\r\n    UxNoX_sra, Wi_list, Fi_list, Nx02=SRA(curr_EDs,20,800)\r\n    finish2 = time.time()\r\n\r\n    start3=time.time()\r\n    UxSUM, Nx03=SUM(curr_EDs,20e6,800e9)\r\n    finish3=time.time()\r\n\r\n    # print(f\"{i} EDs -> Utility: {UxNxO}\")\r\n    x_values1.append(i)\r\n    y_values1.append(UxNxO_mums) #utility from MUMS\r\n    y_values2.append(UxNoX_sra) #utility from SRA\r\n    y_values3.append(UxSUM) #utility from SUM\r\n    time_of_MUMS_execution.append(finish1-start1)\r\n    time_of_SRA_execution.append(finish2-start2)\r\n    time_of_SUM_execution.append(finish3-start3)\r\n    successful_offloaders_mums.append(len(Nx01))\r\n    successful_offloaders_sra.append(Nx02)\r\n    successful_offloaders_sum.append(len(Nx03))\r\n\r\nfig, axs = plt.subplots(3, 1, figsize=(8, 12))\r\n\r\n# MUMS\r\naxs[0].plot(x_values1, y_values1)\r\naxs[0].set_title(\"Dis CNN\")\r\naxs[0].set_xlabel(\"Number of EDs\")\r\naxs[0].set_ylabel(\"Max Total Utility\")\r\naxs[0].set_xticks(x_values1)\r\n\r\n# SRA\r\naxs[1].plot(x_values1, y_values2)\r\naxs[1].set_title(\"SRA\")\r\naxs[1].set_xlabel(\"Offloaders\")\r\naxs[1].set_ylabel(\"Max Total Utility\")\r\naxs[1].set_xticks(x_values1)\r\n\r\n# SUM\r\naxs[2].plot(x_values1, y_values3)\r\naxs[2].set_title(\"SUM\")\r\naxs[2].set_xlabel(\"Number of EDs\")\r\naxs[2].set_ylabel(\"Max Total Utility\")\r\naxs[2].set_xticks(x_values1)\r\n\r\nplt.tight_layout()\r\nplt.savefig(\"no_of_EDs_vs_max_total_utility.png\")\r\n\r\n\"\"\"\r\n\r\nIssue: MUMS() was modifying the original EDs or models objects. Since Python passes objects by reference, changes made in the first call remained for later calls.\r\n\r\nSo:\r\n\r\nMUMS(first 2 EDs)  # modifies objects\r\nMUMS(first 4 EDs)  # uses already modified objects → utility becomes 0\r\n\r\nHow deepcopy fixed it:\r\n\r\ncurr_EDs = copy.deepcopy(no_of_offloaders[:i])\r\ncurr_models = copy.deepcopy(models)\r\n\r\ndeepcopy creates completely new independent objects, so each call to MUMS() starts with fresh data and cannot affect later calls.\r\n\r\n\"\"\"\r\n\r\n\r\n\r\n# print(\"x =\", x_values1)\r\n# print(\"y =\", y_values1)\r\n\r\n# print(*x_values1)\r\n# print(*y_values1)\r\n\r\n# plt.plot(x_values1, y_values1)\r\n# plt.xlabel(\"Number of Offloaders\")\r\n# plt.ylabel(\"Max Total Utility\")\r\n# plt.title(\"Number of Offloaders vs Max Total Utility\")\r\n# plt.savefig(\"no_of_offloadersVSmax_total_utility.png\")\r\n\r\n\r\n\r\n#Number of offloaders vs Total Energy Consumption\r\n\r\n\r\n\r\n\r\n\r\n#Number of Offloaders vs Successful Offloaders\r\nfig, axs = plt.subplots(3, 1, figsize=(8, 12))\r\n\r\n# MUMS\r\naxs[0].plot(x_values1, successful_offloaders_mums)\r\naxs[0].set_title(\"MUMS\")\r\naxs[0].set_xlabel(\"Number of EDs\")\r\naxs[0].set_ylabel(\"Successful Offloaders\")\r\naxs[0].set_xticks(x_values1)\r\naxs[0].grid(True)\r\n\r\n# SRA\r\naxs[1].plot(x_values1, successful_offloaders_sra)\r\naxs[1].set_title(\"SRA\")\r\naxs[1].set_xlabel(\"Offloaders\")\r\naxs[1].set_ylabel(\"Successful Offloaders\")\r\naxs[1].set_xticks(x_values1)\r\naxs[1].grid(True)\r\n\r\n# SUM\r\naxs[2].plot(x_values1, successful_offloaders_sum)\r\naxs[2].set_title(\"SUM\")\r\naxs[2].set_xlabel(\"Number of EDs\")\r\naxs[2].set_ylabel(\"Successful Offloaders\")\r\naxs[2].set_xticks(x_values1)\r\naxs[2].grid(True)\r\n\r\nplt.tight_layout()\r\nplt.savefig(\"successful_offloaders.png\", dpi=300)\r\n\r\n\r\n# for i in successful_offloaders:\r\n#     print(len(i))\r\n#Number of Offloaders vs Average Inference Delay\r\n\r\n\r\n\r\n#Number of Offloaders vs Average Execution Time\r\n\r\nfig, axs = plt.subplots(3, 1, figsize=(8, 12))\r\n\r\n# MUMS\r\naxs[0].plot(x_values1, time_of_MUMS_execution,\r\n            marker='o')\r\naxs[0].set_title(\"MUMS\")\r\naxs[0].set_xlabel(\"Number of EDs\")\r\naxs[0].set_ylabel(\"Average Execution Time (s)\")\r\naxs[0].set_xticks(x_values1)\r\naxs[0].grid(True)\r\n\r\n# SRA\r\naxs[1].plot(x_values1, time_of_SRA_execution,\r\n            marker='s')\r\naxs[1].set_title(\"SRA\")\r\naxs[1].set_xlabel(\"Number of Offloaders\")\r\naxs[1].set_ylabel(\"Average Execution Time (s)\")\r\naxs[1].set_xticks(x_values1)\r\naxs[1].grid(True)\r\n\r\n# SUM\r\naxs[2].plot(x_values1, time_of_SUM_execution,\r\n            marker='^')\r\naxs[2].set_title(\"SUM\")\r\naxs[2].set_xlabel(\"Number of EDs\")\r\naxs[2].set_ylabel(\"Average Execution Time (s)\")\r\naxs[2].set_xticks(x_values1)\r\naxs[2].grid(True)\r\n\r\nplt.tight_layout()\r\nplt.savefig(\"no_of_offloadersVSavg_execution_time.png\", dpi=300)\r\nplt.close()
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/Code/Algos/Graphs/graph_1.py b/Code/Algos/Graphs/graph_1.py
+--- a/Code/Algos/Graphs/graph_1.py	(revision 4ebb42851f25c3b1b183665292d5fa610d5d7975)
++++ b/Code/Algos/Graphs/graph_1.py	(date 1781687043525)
+@@ -1,6 +1,9 @@
+ import matplotlib
+-matplotlib.use('Agg')
+ import matplotlib.pyplot as plt
++
++matplotlib.use('Agg')
++
++
+ # from ServerRA_i import SRA_i
+ 
+ import sys,os
