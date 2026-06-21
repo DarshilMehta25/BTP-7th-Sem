@@ -1,4 +1,4 @@
-from SingletonUM import SUM
+from Algos.SingletonUM import SUM
 from test2 import EDs, models
 from MUMS import MUMS
 

@@ -1,13 +1,12 @@
 from random import randint,uniform,randrange
-from Classes.ED import ED
-# from Algos.Classes.ED import ED
+from Algos.Classes.ED import ED
 import numpy as np
 from Classes.Model import Layers, Model
 # from typing import Set, List
-from MUMS import MUMS
-from Classes.ED import ED
-from ServerRA import SRA
-from SingletonUM import SUM
+from Algos.MUMS import MUMS
+from Algos.Classes.ED import ED
+from Algos.ServerRA import SRA
+from Algos.SingletonUM import SUM
 
 #storage is assumed to be in MBs
 #computation resources for ED defined in MHz FLOPS

@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 # from Model import Model
-from .Model import Model
+from Classes.Model import Model
 import numpy as np
 
 Ic = 10**(-13) #defined gloabally, average channel coherance time
@@ -16,23 +16,21 @@ class ED:
     energy_consumption_param: float #kil
     transmision_antenna_power_eff_param: float #Bi #in milli watts
 
+    #Server Attributes allocated to ED in case of collaborative inference
+    allocated_wi: float = 0.0
+    allocated_fi: float = 0.0
+    price_paid: float = 0.0  #Acts as marginal utility gain for ESP, So ED knows how much price to be paid to ESP for allocated resources of Edge Server
+
     ed_counter: int = 0
     
     @property
     def id(self) -> int: ED.ed_counter+=1; return ED.ed_counter
 
-    #Coordinates of moving user, dynamically change everytime
-    # @property
-    # def x(self) -> int: self.change_location()[0]
-
-    # @property
-    # def y(self) -> int: self.change_location()[1]
-
-    '''
+    # '''
     #Coordinates of mobile user
-    x: int
-    y: int
-    '''
+    x: float = 0
+    y: float = 0
+    # '''
 
     def local_inference_time(self): #ril
         return sum(self.model.layers.computation_per_layer[:])
@@ -96,16 +94,14 @@ class ED:
                     best_rl = rl
                     best_ru = ru
             
-
-
         return best_partition,best_rl, best_ru, ai
 
 
     def simulate_inference_delay(self):
         pass
 
-    def change_location(self):
+    def initiate_handoff(self):
         pass
 
-    def initiate_handoff(self):
+    def calculate_distance(self, x, y):
         pass

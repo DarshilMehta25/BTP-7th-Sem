@@ -1,5 +1,5 @@
-from Classes.ED import ED
-from Classes.Model import Model, Layers
+from Algos.Classes.ED import ED
+from Algos.Classes.Model import Model, Layers
 # from test import layer
 import numpy as np
 import random

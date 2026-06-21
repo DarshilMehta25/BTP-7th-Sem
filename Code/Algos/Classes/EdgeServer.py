@@ -4,14 +4,11 @@ from dataclasses import dataclass
 class EdgeServer:
     W: int
     F: int
-    Storage: int
+    Storage: int #in MB
     # noise: float
-    # x: int
-    # y: int
-    # coverage_area: float
-
-    def simulate_collab_inference_time(self):
-        pass
+    x: float #Latitude
+    y: float #Longitude
+    coverage_area: float #in meters
 
     def MUA(self):
         pass

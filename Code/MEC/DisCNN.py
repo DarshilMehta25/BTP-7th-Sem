@@ -1,22 +1,23 @@
 import sys
 import os
+import matplotlib
+matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import copy, time
 
-current_dir = os.path.dirname(os.path.abspath(__file__))
-project_root = os.path.dirname(current_dir)
+# current_dir = os.path.dirname(os.path.abspath(__file__))
+# project_root = os.path.dirname(current_dir)
+#
+# # Add the root to sys.path
+# if project_root not in sys.path:
+#     sys.path.append(project_root)
 
-# Add the root to sys.path
-if project_root not in sys.path:
-    sys.path.append(project_root)
-
-from J import J
-from N import EDs, EDs_SUM
+from MEC.J import J
+from MEC.N import EDs, EDs_SUM
 from Algos.Classes.EdgeServer import EdgeServer
-from Algos.Classes.ESP import ESP
+from Algos.Classes.ESP import ESP, ED
 
-server = [EdgeServer(20, 800, 1024)]
-esp = ESP(servers=server)
+server = [EdgeServer(20, 800, 1024, 500)]
 
 eds = EDs
 offloaders = EDs_SUM
@@ -48,20 +49,24 @@ offloaders = EDs_SUM
 # print(no_of_offl)
 # print(Utility)
 
-x_values1 = []
-y_values1 = []
-y_values2 = []
-y_values3 = []
-successful_offloaders_mums = []
-successful_offloaders_sra = []
-successful_offloaders_sum = []
+def Simulate():
 
-time_of_MUMS_execution=[]
-time_of_SRA_execution=[]
-time_of_SUM_execution=[]
+    esp = ESP(servers=server)
 
-def DisCNN():
-    for i in range(0, len(EDs) + 1, 10):
+    x_values1 = []
+    y_values1 = []
+    y_values2 = []
+    y_values3 = []
+    successful_offloaders_mums = []
+    successful_offloaders_sra = []
+    successful_offloaders_sum = []
+
+    time_of_MUMS_execution=[]
+    time_of_SRA_execution=[]
+    time_of_SUM_execution=[]
+
+    for i in range(0, len(EDs) + 1, 5):
+        
         curr_EDs = copy.deepcopy(EDs[:i])
         curr_EDs_SUM = copy.deepcopy(EDs_SUM[:i])
         curr_models = copy.deepcopy(J)
@@ -84,9 +89,9 @@ def DisCNN():
         y_values1.append(UxNxO_mums) #utility from MUMS
         y_values2.append(UxNoX_sra) #utility from SRA
         y_values3.append(UxSUM) #utility from SUM
-        time_of_MUMS_execution.append(finish1-start1)
-        time_of_SRA_execution.append(finish2-start2)
-        time_of_SUM_execution.append(finish3-start3)
+        time_of_MUMS_execution.append((finish1-start1)/2)
+        time_of_SRA_execution.append((finish2-start2)/2)
+        time_of_SUM_execution.append((finish3-start3)/2)
         successful_offloaders_mums.append(len(Nx01))
         successful_offloaders_sra.append(Nx02)
         successful_offloaders_sum.append(len(Nx03))
@@ -136,8 +141,6 @@ def DisCNN():
 
     """
 
-
-
     # print("x =", x_values1)
     # print("y =", y_values1)
 
@@ -150,20 +153,14 @@ def DisCNN():
     # plt.title("Number of Offloaders vs Max Total Utility")
     # plt.savefig("no_of_offloadersVSmax_total_utility.png")
 
-
-
     #Number of offloaders vs Total Energy Consumption
-
-
-
-
-
     #Number of Offloaders vs Successful Offloaders
+
     fig, axs = plt.subplots(3, 1, figsize=(8, 12))
 
     # MUMS
     axs[0].plot(x_values1, successful_offloaders_mums)
-    axs[0].set_title("MUMS")
+    axs[0].set_title("DisCNN")
     axs[0].set_xlabel("Number of EDs")
     axs[0].set_ylabel("Successful Offloaders")
     axs[0].set_xticks(x_values1)
@@ -203,7 +200,7 @@ def DisCNN():
     # MUMS
     axs[0].plot(x_values1, time_of_MUMS_execution,
                 marker='o')
-    axs[0].set_title("MUMS")
+    axs[0].set_title("DisCNN")
     axs[0].set_xlabel("Number of EDs")
     axs[0].set_ylabel("Average Execution Time (s)")
     axs[0].set_xticks(x_values1)
@@ -232,4 +229,36 @@ def DisCNN():
     # plt.show()
     plt.close()
 
-DisCNN()
+def DisCNN():
+
+    esp = ESP(server)
+
+    #Test ED Object created for testing changes in SRA function and ED class
+    
+    # EDs = [   ED(
+    #     local_comp_res=10e9,
+    #     model=J[0],
+    #     task_deadline=6,
+    #     # local_computation_power=5,
+    #     channel_coefficient=1,
+    #     transmission_power=100e-3,
+    #     energy_consumption_param=0.15,
+    #     transmision_antenna_power_eff_param=0.90
+    # )]
+
+    X, NxO, UxNxO = esp.MUMS(EDs, J, 20, 800, 1024) #Model Caching Decision
+    _, Wi_List, Fi_List, no_offloaders = esp.SRA(NxO,20,800) #Resource Allocation to EDs maximizing utility of ESP
+
+    # print(len(X))
+    print(len(NxO))
+    print(UxNxO)
+    print(no_offloaders)
+
+
+    # print(*Wi_List)
+    # print(*Fi_List)
+
+    print(*NxO)
+
+# Simulate() #For Simulation
+DisCNN() #For actual Model Caching and Resource Allocation
