@@ -86,11 +86,3 @@ Algorithm Runtime time module (e)
 List mein se kitno ko reource mile usko N me se subtract kardenge (c)
 Upar ka task Monday, Tuesday ka hain
 Graph ke lie alag se file banana
-
-Utility
-
-Darshil
-Debug and find out issue with utility
-
-Harsh
-Graph part with integration
