@@ -86,3 +86,24 @@ Algorithm Runtime time module (e)
 List mein se kitno ko reource mile usko N me se subtract kardenge (c)
 Upar ka task Monday, Tuesday ka hain
 Graph ke lie alag se file banana
+
+Mobility Model? Mathematical Model or Function that simulates mobile user can be in terms of location, speed, direction, acceleration
+For our project we dont want complex model hence using memory less model which does not depend on past user locations
+Random Direction Choosen since it is memory less and solve the issue of clustering of users at center in case of Random Way Point
+It is easier to implement and understand
+
+For now we simulate outgoing users to show decrease in utility of Edge Server when users go out of range during collab inference
+Subset of users will be mobile
+We need to put users into async function which gives them new location in terms of direction and speed
+When user change location we invoke a member function to check whether collaborative inference is still fearible given its distance from server
+It not then user terminate the process and server deallocates it resources back and hence decrease in utility
+Otherwise collaborative inference continue if user within server range with the allocated server resources
+
+Everytime user change location, user calculate its new distance from server and checks if it is still in server range
+Else it initiates handoff and server reallocates its resource
+User already has knowledge of allocated server resources and price it has to pay
+It simply gives server these values and server has to reduce it from current utility
+If user does not have utility knowledge, calculation has to be done and will lead to overhead
+
+To visualize we can create a scatter plot wherein we can show changing coordinates (x,y)
+So every 0.5 seconds it forms a new plot showing new location
