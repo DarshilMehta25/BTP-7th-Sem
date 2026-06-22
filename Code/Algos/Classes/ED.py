@@ -8,13 +8,24 @@ Ic = 10**(-13) #defined gloabally, average channel coherance time
 @dataclass(frozen=True)
 class ED:
 
-    local_comp_res: int #computation resources FLOPS #fli
+
+
+    local_comp_res: float #computation resources FLOPS #fli
     model: Model #Xi
     task_deadline: int #in  milli seconds #ti
     channel_coefficient: float #hi
     transmission_power: float #pi
     energy_consumption_param: float #kil
     transmision_antenna_power_eff_param: float #Bi #in milli watts
+
+
+
+
+    #latitude and longitude ke liye
+    x:float
+    y:float
+
+
 
     #Server Attributes allocated to ED in case of collaborative inference
     allocated_wi: float = 0.0
