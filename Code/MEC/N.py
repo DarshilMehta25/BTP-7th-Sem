@@ -11,12 +11,13 @@ import os,sys
 from Algos.Classes.ED import ED
 import random
 from MEC.J import J
+from MEC.MUA.test import in_range_user_coords
 
 #File contains ED to simulate Collaborative inference
 
 #For simulation of MUMS,SRA, all devices have randomly assigned models
 EDs = []
-for _ in range(50):
+for i in range(5):
     ed = ED(
         local_comp_res=random.uniform(10, 15) * 1e9,               # Unif[10, 15] GFLOPS
         model=random.choice(J),                                           # Models assigned randomly 
@@ -24,23 +25,25 @@ for _ in range(50):
         channel_coefficient=random.uniform(0.1, 1.0),              # Unif[0.1, 1]
         transmission_power=random.uniform(10, 100) * 1e-3,         # Unif[10, 100] mW
         energy_consumption_param=random.uniform(0.1, 1.0),         # Unif[0.1, 1]
-        transmision_antenna_power_eff_param=random.uniform(0.5, 1.0) # Unif[0.5, 1]
+        transmision_antenna_power_eff_param=random.uniform(0.5, 1.0), # Unif[0.5, 1]
+        x = in_range_user_coords[i][0],
+        y = in_range_user_coords[i][1]
     )
     EDs.append(ed)
 # print(len(EDs))
 
 #For simulation of SUM, all devices are assignet with a single Model
-EDs_SUM = []
-for _ in range(50):
-    ed = ED(
-        local_comp_res=random.uniform(10, 15) * 1e9,               # Unif[10, 15] GFLOPS
-        model= J[0],                                               # strictly assignet googlenet
-        task_deadline=random.uniform(3, 6),                        # Unif[3, 6] s
-        channel_coefficient=random.uniform(0.1, 1.0),              # Unif[0.1, 1]
-        transmission_power=random.uniform(10, 100) * 1e-3,         # Unif[10, 100] mW
-        energy_consumption_param=random.uniform(0.1, 1.0),         # Unif[0.1, 1]
-        transmision_antenna_power_eff_param=random.uniform(0.5, 1.0) # Unif[0.5, 1]
-    )
-    EDs_SUM.append(ed)
+# EDs_SUM = []
+# for _ in range(50):
+#     ed = ED(
+#         local_comp_res=random.uniform(10, 15) * 1e9,               # Unif[10, 15] GFLOPS
+#         model= J[0],                                               # strictly assignet googlenet
+#         task_deadline=random.uniform(3, 6),                        # Unif[3, 6] s
+#         channel_coefficient=random.uniform(0.1, 1.0),              # Unif[0.1, 1]
+#         transmission_power=random.uniform(10, 100) * 1e-3,         # Unif[10, 100] mW
+#         energy_consumption_param=random.uniform(0.1, 1.0),         # Unif[0.1, 1]
+#         transmision_antenna_power_eff_param=random.uniform(0.5, 1.0) # Unif[0.5, 1]
+#     )
+#     EDs_SUM.append(ed)
 # print(EDs_SUM[0])
 # print(len(EDs_SUM))

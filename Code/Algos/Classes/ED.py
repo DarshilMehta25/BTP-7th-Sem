@@ -1,5 +1,5 @@
-from dataclasses import dataclass
-# from Model import Model
+from dataclasses import dataclass, field
+from typing import Callable
 from Classes.Model import Model
 import numpy as np
 
@@ -8,13 +8,20 @@ Ic = 10**(-13) #defined gloabally, average channel coherance time
 @dataclass(frozen=True)
 class ED:
 
-    local_comp_res: int #computation resources FLOPS #fli
+    local_comp_res: float #computation resources FLOPS #fli
     model: Model #Xi
     task_deadline: int #in  milli seconds #ti
     channel_coefficient: float #hi
     transmission_power: float #pi
     energy_consumption_param: float #kil
     transmision_antenna_power_eff_param: float #Bi #in milli watts
+    # on_location_change: Callable
+
+    # '''
+    # Coordinates of mobile user
+    x: float
+    y: float
+    # '''
 
     #Server Attributes allocated to ED in case of collaborative inference
     allocated_wi: float = 0.0
@@ -22,15 +29,22 @@ class ED:
     price_paid: float = 0.0  #Acts as marginal utility gain for ESP, So ED knows how much price to be paid to ESP for allocated resources of Edge Server
 
     ed_counter: int = 0
+
+    # _previous_instance: Any = field(default=None, repr=False, init=True)
+    #
+    # def __post_init__(self):
+    #     # If a previous instance was passed, check what changed
+    #     if self._previous_instance is not None:
+    #         tracked_fields = ['', 'humidity']
+    #         for field_name in tracked_fields:
+    #             old_val = getattr(self._previous_instance, field_name)
+    #             new_val = getattr(self, field_name)
+    #
+    #             # If the value is different, trigger the function automatically
+    #             if old_val != new_val and self.on_change_callback:
     
     @property
     def id(self) -> int: ED.ed_counter+=1; return ED.ed_counter
-
-    # '''
-    #Coordinates of mobile user
-    x: float = 0
-    y: float = 0
-    # '''
 
     def local_inference_time(self): #ril
         return sum(self.model.layers.computation_per_layer[:])
@@ -96,12 +110,6 @@ class ED:
             
         return best_partition,best_rl, best_ru, ai
 
-
     def simulate_inference_delay(self):
         pass
 
-    def initiate_handoff(self):
-        pass
-
-    def calculate_distance(self, x, y):
-        pass

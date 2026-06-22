@@ -46,6 +46,7 @@
     &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
     &quot;Python.DisCNN.executor&quot;: &quot;Run&quot;,
     &quot;Python.graph_1.executor&quot;: &quot;Run&quot;,
+    &quot;Python.test.executor&quot;: &quot;Run&quot;,
     &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
     &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252&quot;: &quot;true&quot;,
     &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
@@ -68,13 +69,13 @@
         <env name="PYTHONUNBUFFERED" value="1" />
       </envs>
       <option name="SDK_HOME" value="" />
-      <option name="SDK_NAME" value="Python 3.13 (BTP-7th-Sem-main) (3)" />
       <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/Code/MEC" />
       <option name="IS_MODULE_SDK" value="false" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
       <option name="DEBUG_JUST_MY_CODE" value="false" />
       <module name="" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
       <option name="RUN_TOOL" value="" />
       <option name="SCRIPT_NAME" value="$PROJECT_DIR$/Code/MEC/DisCNN.py" />
       <option name="PARAMETERS" value="" />
@@ -94,12 +95,12 @@
         <env name="PYTHONUNBUFFERED" value="1" />
       </envs>
       <option name="SDK_HOME" value="" />
-      <option name="SDK_NAME" value="Python 3.13 (BTP-7th-Sem-main) (3)" />
       <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/Code/Algos/Graphs" />
       <option name="IS_MODULE_SDK" value="false" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
       <option name="DEBUG_JUST_MY_CODE" value="false" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
       <option name="RUN_TOOL" value="" />
       <option name="SCRIPT_NAME" value="$PROJECT_DIR$/Code/Algos/Graphs/graph_1.py" />
       <option name="PARAMETERS" value="" />
@@ -135,6 +136,8 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1781541492428</updated>
+      <workItem from="1782128839284" duration="2498000" />
+      <workItem from="1782142891950" duration="4051000" />
     </task>
     <task id="LOCAL-00001" summary="graph part done final">
       <option name="closed" value="true" />
@@ -153,5 +156,8 @@
   <component name="VcsManagerConfiguration">
     <MESSAGE value="graph part done final" />
     <option name="LAST_COMMIT_MESSAGE" value="graph part done final" />
+  </component>
+  <component name="com.intellij.coverage.CoverageDataManagerImpl">
+    <SUITE FILE_PATH="coverage/BTP$test.coverage" NAME="test Coverage Results" MODIFIED="1782133130368" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/Code/MEC/MUA" />
   </component>
 </project>

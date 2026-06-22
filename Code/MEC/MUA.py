@@ -8,7 +8,6 @@ from Algos.Classes.ED import ED
 from typing import Iterator, Optional
 from dataclasses import replace
 
-#Base file addresses
 edge_server_coords_file_path = "./Dataset/site-optus-melbCBD.csv"
 user_coords_file_path = "./Dataset/users-melbcbd-generated.csv"
 
@@ -19,18 +18,8 @@ edge_server_lats = edge_server_data["LATITUDE"].head(5) #Edge Server Latitude
 edge_server_longs = edge_server_data["LONGITUDE"].head(5) #Edge Server Longitude
 edge_server_coords = pd.DataFrame((edge_server_lats,edge_server_longs)) #Combined coordinates
 
-# print(users_data)
-# print(*edge_server_lats)
-# print(*edge_server_longs)
-# print(edge_server_coords)
-
 server_lat, server_long = edge_server_coords[0] #Server Coorinates assigned
 es = EdgeServer(20,800,1024,server_lat,server_long,500) #coverage area kept 500meters can be changed later as per server configuration
-
-# print(es)
-# print(es.coverage_area)
-# print(server_lat)
-# print(server_long)
 
 def HaversineFormula(x1: float, y1: float, x2: float, y2: float) -> float: #returns distance b/w 2 coordinates in meters
 
@@ -44,10 +33,6 @@ def HaversineFormula(x1: float, y1: float, x2: float, y2: float) -> float: #retu
     r = 6371.0 #radius of earth
     return c * r * 1000 #multiply with 100 to convert distance to meters
 
-# print(user_lat, user_long)
-# print(users_data.iloc[0])
-# print(users_data.shape[0])
-
 in_range_user_coords = [] #list of user coordinates within range of server
 out_of_range_user_coords = [] #list of user coordinates out or range
 
@@ -60,21 +45,7 @@ for i in range(users_data.shape[0]-1):
     else:
         out_of_range_user_coords.append((user_lat, user_long))
 
-# print(*in_range_user_coords)
-# print(*out_of_range_user_coords)
-
-# print(len(in_range_user_coords))
 in_range_user_coords = in_range_user_coords[:20] #list size reduces to number of test users
-# print(len(in_range_user_coords))
-
-# Flow
-# Make a function of random direction where once ED is passed, its coordinates change such that it goes out of range of server within 3-6 seconds to simulate mobile users
-# No need to pass user coordinates as it is device position independent
-# For using subset of users slice the ED list
-# Make ED instances here from ED class
-# ED ke instance idhar banadena as per requirement jo bhi attribute dalne ho dal dena abhi coordinates change karne se kaam hain
-# This function does not return any value just change user coordinates
-# Replace function use karke ED ko har ek baar pura replicate kar na hoga cuz attributes once defined are freezed
 
 EARTH_RADIUS_M = 6_371_000.0   # meters, matches the HaversineFormula in site script
 DEFAULT_DT = 0.5               # seconds between coordinate updates (as requested)
@@ -180,101 +151,23 @@ def RandomDirectionModel(
             speed = rng.uniform(min_speed, max_speed)
             segment_remaining = rng.uniform(min_segment, max_segment)
 
-# from Algos.test2 import models
+def handoff_decision(ed: ED, es: EdgeServer):
 
-if __name__ == "__main__":
+    if(HaversineFormula(ed.x,ed.y,es.x,es.y) <= es.coverage_area): #calculates distance of the ED from Edge Server
+        return False #Handoff not required, if within range of server
+    else:
+        return True #If ED outside coverage area, then handoff required
 
-    # Assign first two generated users to two EDs
-    lat1, lon1 = in_range_user_coords[0]
-    lat2, lon2 = in_range_user_coords[1]
+def initiate_handoff(ed: ED, es: EdgeServer):
 
-    # eds = [
-    #
-    #     ED(
-    #         local_comp_res=12e9, #yea mene int se float kiya hai
-    #         model=models[0],
-    #         task_deadline=5,
-    #         channel_coefficient=0.5,
-    #         transmission_power=80e-3,
-    #         energy_consumption_param=0.5,
-    #         transmision_antenna_power_eff_param=0.75,
-    #         x=lat1,
-    #         y=lon1
-    #     ),
-    #
-    #
-    #
-    #
-    #     ED(
-    #         local_comp_res=10e9,
-    #         model=models[0],
-    #         task_deadline=2,
-    #         channel_coefficient=0.2,
-    #         transmission_power=25e-3,
-    #         energy_consumption_param=0.7,
-    #         transmision_antenna_power_eff_param=0.80,
-    #         x=lat2,
-    #         y=lon2
-    #     )
-    #
-    # ]
+   if(handoff_decision(ed,ed)):
+       es.Utility -= ed.price_paid
+       ed = ed.replace(ed, price_paid = 0)
+       return
+
+   else:
+       return
 
 
-    eds = N.EDs
-
-
-    for idx, ed in enumerate(eds, start=1):
-
-        print("\n" + "=" * 60)
-        print(f"ED {idx}")
-        #
-        # print("ed.x =", ed.x, type(ed.x))
-        # print("ed.y =", ed.y, type(ed.y))
-        # print("es.x =", es.x, type(es.x))
-        # print("es.y =", es.y, type(es.y))
-
-        initial_distance = HaversineFormula(
-            ed.x,
-            ed.y,
-            es.x,
-            es.y
-        )
-
-        print(f"Initial Distance: {initial_distance:.2f} m")
-
-        handoff = False
-
-        for state in RandomDirectionModel(ed):
-
-            # print("ed.x =", state.x, type(ed.x))
-            # print("ed.y =", state.y, type(ed.y))
-            # print("es.x =", es.x, type(es.x))
-            # print("es.y =", es.y, type(es.y))
-
-            # print("Old:", state.x, state.y)
-
-            dist = HaversineFormula(
-                state.x,
-                state.y,
-                es.x,
-                es.y
-            )
-
-            print(
-                f"Lat={state.x:.6f}, "
-                f"Lon={state.y:.6f}, "
-                f"Distance={dist:.2f} m"
-            )
-
-            if dist > es.coverage_area:
-
-                print(
-                    f"HANDOFF REQUIRED "
-                    f"(Distance={dist:.2f} m)"
-                )
-
-                handoff = True
-                break
-
-        if not handoff:
-            print("ED remained inside coverage area")
+def MUA():
+    pass
