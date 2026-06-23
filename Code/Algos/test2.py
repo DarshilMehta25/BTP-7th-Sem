@@ -171,75 +171,75 @@ densenet = Model(
 
 # print(SRA_i(ed, 20e6, 800e9))
 
-EDs = [
-
-    # MobileNet users
-    ED(
-        local_comp_res=12e9,
-        model=mobilenet,
-        task_deadline=5,
-        # local_computation_power=2,
-        channel_coefficient=0.5,
-        transmission_power=80e-3,
-        energy_consumption_param=0.5,
-        transmision_antenna_power_eff_param=0.75
-    ),
-
-    ED(
-        local_comp_res=10e9,
-        model=mobilenet,
-        task_deadline=2,
-        # local_computation_power=2,
-        channel_coefficient=0.2,
-        transmission_power=25e-3,
-        energy_consumption_param=0.7,
-        transmision_antenna_power_eff_param=0.80
-    ),
-
-    ED(
-        local_comp_res=13e9,
-        model=mobilenet,
-        task_deadline=4,
-        # local_computation_power=3,
-        channel_coefficient=0.35,
-        transmission_power=10e-3,
-        energy_consumption_param=0.3,
-        transmision_antenna_power_eff_param=0.82
-    ),
-
-    ED(
-        local_comp_res=10e9,
-        model=mobilenet,
-        task_deadline=1,
-        # local_computation_power=3,
-        channel_coefficient=0.75,
-        transmission_power=50e-3,
-        energy_consumption_param=0.95,
-        transmision_antenna_power_eff_param=0.85
-    ),
-
-    ED(
-        local_comp_res=15e9,
-        model=mobilenet,
-        task_deadline=6,
-        # local_computation_power=4,
-        channel_coefficient=0.95,
-        transmission_power=50e-3,
-        energy_consumption_param=0.45,
-        transmision_antenna_power_eff_param=0.88
-    ),
-
-    ED(
-        local_comp_res=10e9,
-        model=mobilenet,
-        task_deadline=6,
-        # local_computation_power=5,
-        channel_coefficient=1,
-        transmission_power=100e-3,
-        energy_consumption_param=0.15,
-        transmision_antenna_power_eff_param=0.90
-    )
-]
+# EDs = [
+#
+#     # MobileNet users
+#     ED(
+#         local_comp_res=12e9,
+#         model=mobilenet,
+#         task_deadline=5,
+#         # local_computation_power=2,
+#         channel_coefficient=0.5,
+#         transmission_power=80e-3,
+#         energy_consumption_param=0.5,
+#         transmision_antenna_power_eff_param=0.75
+#     ),
+#
+#     ED(
+#         local_comp_res=10e9,
+#         model=mobilenet,
+#         task_deadline=2,
+#         # local_computation_power=2,
+#         channel_coefficient=0.2,
+#         transmission_power=25e-3,
+#         energy_consumption_param=0.7,
+#         transmision_antenna_power_eff_param=0.80
+#     ),
+#
+#     ED(
+#         local_comp_res=13e9,
+#         model=mobilenet,
+#         task_deadline=4,
+#         # local_computation_power=3,
+#         channel_coefficient=0.35,
+#         transmission_power=10e-3,
+#         energy_consumption_param=0.3,
+#         transmision_antenna_power_eff_param=0.82
+#     ),
+#
+#     ED(
+#         local_comp_res=10e9,
+#         model=mobilenet,
+#         task_deadline=1,
+#         # local_computation_power=3,
+#         channel_coefficient=0.75,
+#         transmission_power=50e-3,
+#         energy_consumption_param=0.95,
+#         transmision_antenna_power_eff_param=0.85
+#     ),
+#
+#     ED(
+#         local_comp_res=15e9,
+#         model=mobilenet,
+#         task_deadline=6,
+#         # local_computation_power=4,
+#         channel_coefficient=0.95,
+#         transmission_power=50e-3,
+#         energy_consumption_param=0.45,
+#         transmision_antenna_power_eff_param=0.88
+#     ),
+#
+#     ED(
+#         local_comp_res=10e9,
+#         model=mobilenet,
+#         task_deadline=6,
+#         # local_computation_power=5,
+#         channel_coefficient=1,
+#         transmission_power=100e-3,
+#         energy_consumption_param=0.15,
+#         transmision_antenna_power_eff_param=0.90
+#     )
+# ]
 
 # for _ in range(44):
 #     new_ed = ED(
@@ -255,7 +255,7 @@ EDs = [
 
 # print(len(EDs_SUM))
 
-models= [mobilenet,resnet18,resnet34,resnet50,alexnet,googlenet,inceptionv3,vgg16,vgg19,densenet]
+# models= [mobilenet,resnet18,resnet34,resnet50,alexnet,googlenet,inceptionv3,vgg16,vgg19,densenet]
 
 
 

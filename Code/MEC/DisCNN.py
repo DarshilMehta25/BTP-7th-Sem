@@ -1,25 +1,14 @@
-import sys
-import os
 import matplotlib
 matplotlib.use('Agg')
-import matplotlib.pyplot as plt
-import copy, time
-
-# current_dir = os.path.dirname(os.path.abspath(__file__))
-# project_root = os.path.dirname(current_dir)
-#
-# # Add the root to sys.path
-# if project_root not in sys.path:
-#     sys.path.append(project_root)
 
 from MEC.J import J
-from MEC.N import EDs
-# EDs_SUM
+from MEC.N import initialize_EDs
+import pandas as pd
 from Algos.Classes.EdgeServer import EdgeServer
 from Algos.Classes.ESP import ESP, ED
 
 
-eds = EDs
+# eds = EDs
 # offloaders = EDs_SUM
 
 
@@ -229,10 +218,23 @@ eds = EDs
 #     # plt.show()
 #     plt.close()
 
-def DisCNN():
+edge_server_coords_file_path = "./MUA/Dataset/site-optus-melbCBD.csv"
+edge_server_data = pd.read_csv(filepath_or_buffer=edge_server_coords_file_path)
 
-    server = [EdgeServer(20, 800, 1024, 500)]
-    esp = ESP(server)
+def DisCNN(es:EdgeServer):
+
+    # edge_server_lats = edge_server_data["LATITUDE"].head(5)  # Edge Server Latitude
+    # edge_server_longs = edge_server_data["LONGITUDE"].head(5)  # Edge Server Longitude
+    # edge_server_coords = pd.DataFrame((edge_server_lats, edge_server_longs))  # Combined coordinates
+
+    # server_lat, server_long = edge_server_coords[0]  # Server Coorinates assigned
+    # es = EdgeServer(20, 800, 1024, server_lat, server_long,500)  # coverage area kept 500meters can be changed later as per server configuration
+
+    # server = [EdgeServer(20, 800, 1024, 500)]
+    esp = ESP(es)
+    EDs = initialize_EDs(es) #EDs initialized as within server placement
+
+    # print(*EDs)
 
     #Test ED Object created for testing changes in SRA function and ED class
     
@@ -247,19 +249,21 @@ def DisCNN():
     #     transmision_antenna_power_eff_param=0.90
     # )]
 
-    X, NxO, server.Utility = esp.MUMS(EDs, J, 20, 800, 1024) #Model Caching Decision
+    X, NxO, es.Utility = esp.MUMS(EDs, J, 20, 800, 1024) #Model Caching Decision
     _, Wi_List, Fi_List, no_offloaders = esp.SRA(NxO,20,800) #Resource Allocation to EDs maximizing utility of ESP
 
     # print(len(X))
-    print(len(NxO))
-    print(server.Utility)
-    print(no_offloaders)
+    # print(len(NxO))
+    # print(es.Utility)
+    # print(no_offloaders)
+
+    return NxO
 
 
     # print(*Wi_List)
     # print(*Fi_List)
 
-    print(*NxO)
+    # print(*NxO)
 
 # Simulate() #For Simulation
-DisCNN() #For actual Model Caching and Resource Allocation
+# DisCNN() #For actual Model Caching and Resource Allocation

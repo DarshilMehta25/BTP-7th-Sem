@@ -2,14 +2,16 @@ from Algos.Classes.EdgeServer import  EdgeServer
 import pandas as pd
 # from random import randint
 import math
-from MEC import N
+from MEC.N import initialize_EDs
 import random
 from Algos.Classes.ED import ED
 from typing import Iterator, Optional
 from dataclasses import replace
 
-edge_server_coords_file_path = "./Dataset/site-optus-melbCBD.csv"
-user_coords_file_path = "./Dataset/users-melbcbd-generated.csv"
+# from MEC.DisCNN import DisCNN
+
+edge_server_coords_file_path = "./MUA/Dataset/site-optus-melbCBD.csv"
+user_coords_file_path = "./MUA/Dataset/users-melbcbd-generated.csv"
 
 edge_server_data = pd.read_csv(filepath_or_buffer=edge_server_coords_file_path)
 users_data = pd.read_csv(filepath_or_buffer=user_coords_file_path) #Already in DF format just have to filter coordinates with server range
@@ -164,10 +166,104 @@ def initiate_handoff(ed: ED, es: EdgeServer):
        es.Utility -= ed.price_paid
        ed = ed.replace(ed, price_paid = 0)
        return
-
    else:
        return
 
+# DisCNN(es)
 
-def MUA():
-    pass
+if __name__ == "__main__":
+
+    # Assign first two generated users to two EDs
+    lat1, lon1 = in_range_user_coords[0]
+    lat2, lon2 = in_range_user_coords[1]
+
+    # eds = [
+    #
+    #     ED(
+    #         local_comp_res=12e9, #yea mene int se float kiya hai
+    #         model=models[0],
+    #         task_deadline=5,
+    #         channel_coefficient=0.5,
+    #         transmission_power=80e-3,
+    #         energy_consumption_param=0.5,
+    #         transmision_antenna_power_eff_param=0.75,
+    #         x=lat1,
+    #         y=lon1
+    #     ),
+    #
+    #
+    #
+    #
+    #     ED(
+    #         local_comp_res=10e9,
+    #         model=models[0],
+    #         task_deadline=2,
+    #         channel_coefficient=0.2,
+    #         transmission_power=25e-3,
+    #         energy_consumption_param=0.7,
+    #         transmision_antenna_power_eff_param=0.80,
+    #         x=lat2,
+    #         y=lon2
+    #     )
+    #
+    # ]
+
+
+    eds = initialize_EDs(es)
+
+
+    for idx, ed in enumerate(eds, start=1):
+
+        print("\n" + "=" * 60)
+        print(f"ED {idx}")
+        #
+        # print("ed.x =", ed.x, type(ed.x))
+        # print("ed.y =", ed.y, type(ed.y))
+        # print("es.x =", es.x, type(es.x))
+        # print("es.y =", es.y, type(es.y))
+
+        initial_distance = HaversineFormula(
+            ed.x,
+            ed.y,
+            es.x,
+            es.y
+        )
+
+        print(f"Initial Distance: {initial_distance:.2f} m")
+
+        handoff = False
+
+        for state in RandomDirectionModel(ed):
+
+            # print("ed.x =", state.x, type(ed.x))
+            # print("ed.y =", state.y, type(ed.y))
+            # print("es.x =", es.x, type(es.x))
+            # print("es.y =", es.y, type(es.y))
+
+            # print("Old:", state.x, state.y)
+
+            dist = HaversineFormula(
+                state.x,
+                state.y,
+                es.x,
+                es.y
+            )
+
+            print(
+                f"Lat={state.x:.6f}, "
+                f"Lon={state.y:.6f}, "
+                f"Distance={dist:.2f} m"
+            )
+
+            if dist > es.coverage_area:
+
+                print(
+                    f"HANDOFF REQUIRED "
+                    f"(Distance={dist:.2f} m)"
+                )
+
+                handoff = True
+                break
+
+        if not handoff:
+            print("ED remained inside coverage area")

@@ -2,9 +2,9 @@ from __future__ import annotations
 import os
 
 from Algos.Classes.EdgeServer import  EdgeServer
-from MEC import N
+from MEC.N import initialize_EDs
 # from MEC.MUA.test import in_range_user_coords
-import pandas as pd
+# import pandas as pd
 from random import randint
 import math
 from Algos.Classes.ED import ED
@@ -333,7 +333,7 @@ def RandomDirectionModel(
             speed = rng.uniform(min_speed, max_speed)
             segment_remaining = rng.uniform(min_segment, max_segment)
 
-from Algos.test2 import models
+from MEC.J import J
 
 if __name__ == "__main__":
 
@@ -373,7 +373,7 @@ if __name__ == "__main__":
     # ]
 
 
-    eds = N.EDs
+    eds = initialize_EDs(es)
 
 
     for idx, ed in enumerate(eds, start=1):

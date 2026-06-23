@@ -1,14 +1,5 @@
 from random import randint, randrange
 import numpy as np
-import os,sys
-# print(os.getcwd())
-# current_dir = os.path.dirname(os.path.abspath(__file__))
-# print(current_dir)
-# project_root = os.path.dirname(current_dir)
-# print(project_root)
-# if project_root not in sys.path:
-    # sys.path.append(project_root)
-# print(sys.path)
 from Algos.Classes.Model import Model,Layers
 
 # File contains Model J required by ED for inference tasks
