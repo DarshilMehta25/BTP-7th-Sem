@@ -6,4 +6,5 @@ Problem Statement - Solving PCRP Problem in Dynamic Network Scenario (Mobile/Mov
 
 Experimental Setup:
 
-Python Version - 3.11
+Python Version - 3.11\
+Other libraries have been specified in requirements.txt file\

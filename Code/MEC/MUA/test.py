@@ -1,8 +1,12 @@
 from Algos.Classes.EdgeServer import  EdgeServer
 import pandas as pd
-from random import randint
+# from random import randint
 import math
+from MEC import N
+import random
 from Algos.Classes.ED import ED
+from typing import Iterator, Optional
+from dataclasses import replace
 
 #Base file addresses
 edge_server_coords_file_path = "./Dataset/site-optus-melbCBD.csv"
@@ -72,6 +76,205 @@ in_range_user_coords = in_range_user_coords[:20] #list size reduces to number of
 # This function does not return any value just change user coordinates
 # Replace function use karke ED ko har ek baar pura replicate kar na hoga cuz attributes once defined are freezed
 
-def RandomDirectionModel(ed: ED):
-    pass
+EARTH_RADIUS_M = 6_371_000.0   # meters, matches the HaversineFormula in site script
+DEFAULT_DT = 0.5               # seconds between coordinate updates (as requested)
+DEFAULT_MIN_SPEED = 50.0        # m/s, slow walking pace
+DEFAULT_MAX_SPEED = 100.0        # m/s, fast walk / light jog
+DEFAULT_MIN_SEGMENT = 0.5      # seconds a (heading, speed) pair is held before
+DEFAULT_MAX_SEGMENT = 2.5      # being redrawn -- this is T_{j+1} - T_j in the paper
+MAX_TURN = math.pi / 3
 
+def _meters_to_lat_long_delta(dx_north_m: float, dy_east_m: float, lat_deg: float) -> tuple[float, float]:
+    """
+    Convert a local-plane displacement in meters (north, east) into a
+    (delta_latitude, delta_longitude) offset in degrees, evaluated at the
+    given latitude (small-displacement approximation, same scale used by
+    a Haversine-based distance check).
+    """
+    d_lat = (dx_north_m / EARTH_RADIUS_M) * (180.0 / math.pi)
+    d_lon = (dy_east_m / (EARTH_RADIUS_M * math.cos(math.radians(lat_deg)))) * (180.0 / math.pi)
+    return d_lat, d_lon
+
+def RandomDirectionModel(
+    ed: ED,
+    duration: Optional[float] = None,
+    dt: float = DEFAULT_DT,
+    min_speed: float = DEFAULT_MIN_SPEED,
+    max_speed: float = DEFAULT_MAX_SPEED,
+    min_segment: float = DEFAULT_MIN_SEGMENT,
+    max_segment: float = DEFAULT_MAX_SEGMENT,
+    seed: Optional[int] = None,
+) -> Iterator[ED]:
+    """
+    Random Direction mobility generator for a single ED.
+
+    Yields a brand-new ED every `dt` seconds with updated (x, y) =
+    (latitude, longitude), for `duration` seconds of simulated time.
+
+    Parameters
+    ----------
+    ed : ED
+        Starting state of the device (must already carry x, y).
+    duration : float, optional
+        Total simulated time in seconds. Defaults to a random value in
+        [3, 6) seconds, matching the "3-6 second" test window you noted.
+    dt : float
+        Coordinate-update granularity in seconds (default 0.5s).
+    min_speed, max_speed : float
+        Speed range (m/s) redrawn at each new movement segment.
+    min_segment, max_segment : float
+        How long (seconds) a (heading, speed) pair is held before a new
+        one is drawn -- T_{j+1} - T_j in the paper's notation.
+    seed : int, optional
+        Seed for a reproducible trajectory (handy for tests).
+
+    Yields
+    ------
+    ED
+        A new ED instance per dt-step, identical to the input except for
+        updated x (latitude) and y (longitude).
+    """
+    rng = random.Random(seed)
+
+    elapsed = 0.0
+    total_time = duration if duration is not None else rng.uniform(3.0, 6.0)
+
+    # theta_0 drawn uniformly in [0, 2*pi) -- matches the paper's stationary
+    # result (Prop. 4.1): start the device "already mixed" in heading.
+    # move initially away from server
+    #
+    # print(type(ed.x)," ",ed.x)
+    # print(type(ed.y)," ",ed.y)
+
+    north = ed.x - server_lat
+    east = ed.y - server_long
+
+    theta = math.atan2(east, north)
+    speed = rng.uniform(min_speed, max_speed)
+    segment_remaining = rng.uniform(min_segment, max_segment)
+
+    current = ed
+
+    while elapsed < total_time:
+        step = min(dt, total_time - elapsed)
+
+        # advance position for this micro-step at the current (theta, speed)
+        dist_m = speed * step
+        dx_north = dist_m * math.cos(theta)   # ED.x == latitude  == north
+        dy_east = dist_m * math.sin(theta)    # ED.y == longitude == east
+        d_lat, d_lon = _meters_to_lat_long_delta(dx_north, dy_east, current.x)
+
+        current = replace(current, x=current.x + d_lat, y=current.y + d_lon)
+        elapsed += step
+        segment_remaining -= step
+
+        yield current
+
+        # time for a new relative direction / speed? (this is a T_j event)
+        if segment_remaining <= 0:
+            # gamma_j (eq. 26): a bounded turn rather than a full uniform
+            # redraw, so the path looks like a real pedestrian/vehicle
+            # track instead of reversing direction every segment.
+            gamma = rng.uniform(-MAX_TURN, MAX_TURN)
+            theta = (theta + gamma) % (2 * math.pi)
+            speed = rng.uniform(min_speed, max_speed)
+            segment_remaining = rng.uniform(min_segment, max_segment)
+
+# from Algos.test2 import models
+
+if __name__ == "__main__":
+
+    # Assign first two generated users to two EDs
+    lat1, lon1 = in_range_user_coords[0]
+    lat2, lon2 = in_range_user_coords[1]
+
+    # eds = [
+    #
+    #     ED(
+    #         local_comp_res=12e9, #yea mene int se float kiya hai
+    #         model=models[0],
+    #         task_deadline=5,
+    #         channel_coefficient=0.5,
+    #         transmission_power=80e-3,
+    #         energy_consumption_param=0.5,
+    #         transmision_antenna_power_eff_param=0.75,
+    #         x=lat1,
+    #         y=lon1
+    #     ),
+    #
+    #
+    #
+    #
+    #     ED(
+    #         local_comp_res=10e9,
+    #         model=models[0],
+    #         task_deadline=2,
+    #         channel_coefficient=0.2,
+    #         transmission_power=25e-3,
+    #         energy_consumption_param=0.7,
+    #         transmision_antenna_power_eff_param=0.80,
+    #         x=lat2,
+    #         y=lon2
+    #     )
+    #
+    # ]
+
+
+    eds = N.EDs
+
+
+    for idx, ed in enumerate(eds, start=1):
+
+        print("\n" + "=" * 60)
+        print(f"ED {idx}")
+        #
+        # print("ed.x =", ed.x, type(ed.x))
+        # print("ed.y =", ed.y, type(ed.y))
+        # print("es.x =", es.x, type(es.x))
+        # print("es.y =", es.y, type(es.y))
+
+        initial_distance = HaversineFormula(
+            ed.x,
+            ed.y,
+            es.x,
+            es.y
+        )
+
+        print(f"Initial Distance: {initial_distance:.2f} m")
+
+        handoff = False
+
+        for state in RandomDirectionModel(ed):
+
+            # print("ed.x =", state.x, type(ed.x))
+            # print("ed.y =", state.y, type(ed.y))
+            # print("es.x =", es.x, type(es.x))
+            # print("es.y =", es.y, type(es.y))
+
+            # print("Old:", state.x, state.y)
+
+            dist = HaversineFormula(
+                state.x,
+                state.y,
+                es.x,
+                es.y
+            )
+
+            print(
+                f"Lat={state.x:.6f}, "
+                f"Lon={state.y:.6f}, "
+                f"Distance={dist:.2f} m"
+            )
+
+            if dist > es.coverage_area:
+
+                print(
+                    f"HANDOFF REQUIRED "
+                    f"(Distance={dist:.2f} m)"
+                )
+
+                handoff = True
+                break
+
+        if not handoff:
+            print("ED remained inside coverage area")

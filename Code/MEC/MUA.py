@@ -1,125 +1,27 @@
-from __future__ import annotations
-import os
-
 from Algos.Classes.EdgeServer import  EdgeServer
-from MEC.N import initialize_EDs
-# from MEC.MUA.test import in_range_user_coords
-# import pandas as pd
-from random import randint
-import math
-from Algos.Classes.ED import ED
-
-# #Base file addresses
-# edge_server_coords_file_path = "./Dataset/site-optus-melbCBD.csv"
-# user_coords_file_path = "./Dataset/users-melbcbd-generated.csv"
-#
-# edge_server_data = pd.read_csv(filepath_or_buffer=edge_server_coords_file_path)
-# users_data = pd.read_csv(filepath_or_buffer=user_coords_file_path) #Already in DF format just have to filter coordinates with server range
-#
-# edge_server_lats = edge_server_data["LATITUDE"].head(5) #Edge Server Latitude
-# edge_server_longs = edge_server_data["LONGITUDE"].head(5) #Edge Server Longitude
-# edge_server_coords = pd.DataFrame((edge_server_lats,edge_server_longs)) #Combined coordinates
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 import pandas as pd
+# from random import randint
+import math
+from MEC.N import initialize_EDs
 import random
+from Algos.Classes.ED import ED
+from typing import Iterator, Optional
+from dataclasses import replace
 
-# Edge Server Coordinates (Melbourne CBD approx)
-server_lat = -37.8136
-server_long = 144.9631
+# from MEC.DisCNN import DisCNN
 
-# Create 100 users within ~300m radius
-users = []
+edge_server_coords_file_path = "./MUA/Dataset/site-optus-melbCBD.csv"
+user_coords_file_path = "./MUA/Dataset/users-melbcbd-generated.csv"
 
-for _ in range(100):
-    lat = server_lat + random.uniform(-0.002, 0.002)
-    lon = server_long + random.uniform(-0.002, 0.002)
-    users.append([lat, lon])
+edge_server_data = pd.read_csv(filepath_or_buffer=edge_server_coords_file_path)
+users_data = pd.read_csv(filepath_or_buffer=user_coords_file_path) #Already in DF format just have to filter coordinates with server range
 
-users_data = pd.DataFrame(users, columns=["LATITUDE", "LONGITUDE"])
+edge_server_lats = edge_server_data["LATITUDE"].head(5) #Edge Server Latitude
+edge_server_longs = edge_server_data["LONGITUDE"].head(5) #Edge Server Longitude
+edge_server_coords = pd.DataFrame((edge_server_lats,edge_server_longs)) #Combined coordinates
 
-
-#server ki position hardcode ki hai
-server_lat = -37.8136
-server_long = 144.9631
-
-
-
-
-
-
-
-
-
-
-
-# print(users_data)
-# print(*edge_server_lats)
-# print(*edge_server_longs)
-# print(edge_server_coords)
-
-# server_lat, server_long = edge_server_coords[0] #Server Coorinates assigned
-# es = EdgeServer(20,800,1024,server_lat,server_long,500) #coverage area kept 500meters can be changed later as per server configuration
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-es = EdgeServer(
-    20,
-    800,
-    1024,
-    server_lat,
-    server_long,
-    500
-)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-# print(es)
-# print(es.coverage_area)
-# print(server_lat)
-# print(server_long)
+server_lat, server_long = edge_server_coords[0] #Server Coorinates assigned
+es = EdgeServer(20,800,1024,server_lat,server_long,500) #coverage area kept 500meters can be changed later as per server configuration
 
 def HaversineFormula(x1: float, y1: float, x2: float, y2: float) -> float: #returns distance b/w 2 coordinates in meters
 
@@ -133,10 +35,6 @@ def HaversineFormula(x1: float, y1: float, x2: float, y2: float) -> float: #retu
     r = 6371.0 #radius of earth
     return c * r * 1000 #multiply with 100 to convert distance to meters
 
-# print(user_lat, user_long)
-# print(users_data.iloc[0])
-# print(users_data.shape[0])
-
 in_range_user_coords = [] #list of user coordinates within range of server
 out_of_range_user_coords = [] #list of user coordinates out or range
 
@@ -149,92 +47,15 @@ for i in range(users_data.shape[0]-1):
     else:
         out_of_range_user_coords.append((user_lat, user_long))
 
-# print(*in_range_user_coords)
-# print(*out_of_range_user_coords)
-
-# print(len(in_range_user_coords))
 in_range_user_coords = in_range_user_coords[:20] #list size reduces to number of test users
-# print(len(in_range_user_coords))
 
-# Flow
-# Make a function of random direction where once ED is passed, its coordinates change such that it goes out of range of server within (change every 0.5 sec -> coordinates)
-# 3-6(task deadline) seconds to simulate mobile users
-# No need to pass user coordinates as it is device position independent
-# For using subset of users slice the ED list
-# Make ED instances here from ED class
-# ED ke instance idhar banadena as per requirement jo bhi attribute dalne ho dal dena abhi coordinates change karne se kaam hain
-# This function does not return any value just change user coordinates
-# Replace function use karke ED ko har ek baar pura replicate kar na hoga cuz attributes once defined are freezed
-
-# def RandomDirectionModel(ed: ED):
-#
-#
-#
-#     pass
-
-
-
-
-
-
-
-
-
-
-"""
-random_direction.py
-
-Random Direction Mobility Model (RDM) for mobile Edge Devices (ED), based on:
-
-    P. Nain, D. Towsley, B. Liu, Z. Liu, "Properties of Random Direction Models"
-
-Movement pattern (Sec. II of the paper, generalized to 2D in Sec. IV):
-
-    * At time T_j a new relative direction gamma_j and a new speed s_j are drawn.
-    * The absolute heading evolves additively (eq. 26):
-          theta_j = (theta_{j-1} + gamma_j) mod 2*pi
-    * Position evolves at constant speed during [T_j, T_{j+1}) (eq. 28):
-          X(t) = X(T_j) + s_j * (t - T_j) * (cos theta_j, sin theta_j)
-
-ADAPTATION NOTE: the paper bounds the mobile to [0,1) or [0,1)^2 and handles
-boundary hits via wrap-around (Sec II-A / IV-A) or reflection (Sec II-B / IV-B).
-That doesn't apply here -- EDs roam a real, unbounded lat/long plane around a
-fixed EdgeServer, and we *want* them to be able to leave the coverage circle
-so `initiate_handoff()` has something to react to. So no boundary handling is
-implemented; if you later want EDs confined to a bounding box, the wrap-around/
-reflection formulas (eq. 4/6 in the paper) can be folded in on top of this.
-
-ED is a frozen dataclass, so nothing is mutated in place. Each simulated step
-produces a brand-new ED via dataclasses.replace(), and RandomDirectionModel is
-a *generator* -- it yields a new ED every `dt` seconds. The caller drives the
-loop and decides what to do with each state (store the trajectory, check
-distance to an EdgeServer, trigger initiate_handoff(), etc).
-
-
-
-
-"""
-
-import math
-import random
-from dataclasses import replace
-from typing import Iterator, Optional
-
-from Algos.Classes.ED import ED
-
-
-# ---------------------------------------------------------------------------
-# Tunable defaults -- override via function args, don't hardcode-edit these
-# unless you want to change the defaults for every caller.
-# ---------------------------------------------------------------------------
 EARTH_RADIUS_M = 6_371_000.0   # meters, matches the HaversineFormula in site script
 DEFAULT_DT = 0.5               # seconds between coordinate updates (as requested)
 DEFAULT_MIN_SPEED = 50.0        # m/s, slow walking pace
 DEFAULT_MAX_SPEED = 100.0        # m/s, fast walk / light jog
 DEFAULT_MIN_SEGMENT = 0.5      # seconds a (heading, speed) pair is held before
 DEFAULT_MAX_SEGMENT = 2.5      # being redrawn -- this is T_{j+1} - T_j in the paper
-MAX_TURN = math.pi / 3         # max heading change per new segment (radians)
-
+MAX_TURN = math.pi / 3
 
 def _meters_to_lat_long_delta(dx_north_m: float, dy_east_m: float, lat_deg: float) -> tuple[float, float]:
     """
@@ -246,7 +67,6 @@ def _meters_to_lat_long_delta(dx_north_m: float, dy_east_m: float, lat_deg: floa
     d_lat = (dx_north_m / EARTH_RADIUS_M) * (180.0 / math.pi)
     d_lon = (dy_east_m / (EARTH_RADIUS_M * math.cos(math.radians(lat_deg)))) * (180.0 / math.pi)
     return d_lat, d_lon
-
 
 def RandomDirectionModel(
     ed: ED,
@@ -333,7 +153,23 @@ def RandomDirectionModel(
             speed = rng.uniform(min_speed, max_speed)
             segment_remaining = rng.uniform(min_segment, max_segment)
 
-from MEC.J import J
+def handoff_decision(ed: ED, es: EdgeServer):
+
+    if(HaversineFormula(ed.x,ed.y,es.x,es.y) <= es.coverage_area): #calculates distance of the ED from Edge Server
+        return False #Handoff not required, if within range of server
+    else:
+        return True #If ED outside coverage area, then handoff required
+
+def initiate_handoff(ed: ED, es: EdgeServer):
+
+   if(handoff_decision(ed,ed)):
+       es.Utility -= ed.price_paid
+       ed = ed.replace(ed, price_paid = 0)
+       return
+   else:
+       return
+
+# DisCNN(es)
 
 if __name__ == "__main__":
 
@@ -431,9 +267,3 @@ if __name__ == "__main__":
 
         if not handoff:
             print("ED remained inside coverage area")
-
-
-
-
-    #let us now generalize this
-    # x = len(eds)

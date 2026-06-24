@@ -1,0 +1,25 @@
+Extract server lat long and initialize server instance.
+Have to define a New DisCNN in DMUA.py file, which calls some new function for dynamic user
+Or DisCNN me se initial server utility nikal ne ke baad usse store karlo
+DisCNN returns NoX
+
+Then after loop chalake NoX pe 4-4 ko mobile karo with help of RandomDirectionModel function
+Here we will have to take help of threads to make multiple users move simultaneously
+Ek list me NoX ko rakho baad me usme se copy karke subsets ki location change karo
+In each iteration, users will reset to initial position, har baar list jispe se users ko iterate karna hain vo NoX wali main list me
+se copy hogi using copy.deepcopy()
+DisCNN ek baar chalana hain baadme sirf mua vala part chalna chahie
+server utiity ko bhi reset karne ke lie total utility baar baar store karni hogi
+jo change hain vo store hoga for graph plotting
+MUA wala function banana hain jo lega server, NoX
+Server Utility change as we pass it by reference to function DisCNN
+Yaha se results leke graph me plot karna hain alag se file me
+
+
+Sabse pehle server initialize hoga
+
+1. 20 4 mobile
+2 bashar chale gye,
+agle iteration sari ki position vapas se reset karni hain
+DisCNN ka kya matlab? saare device andar tab kitni hain
+bahar nikle to utility dec. decresaser
