@@ -133,6 +133,7 @@ def HaversineFormula(x1: float, y1: float, x2: float, y2: float) -> float: #retu
     r = 6371.0 #radius of earth
     return c * r * 1000 #multiply with 100 to convert distance to meters
 
+
 # print(user_lat, user_long)
 # print(users_data.iloc[0])
 # print(users_data.shape[0])
@@ -338,8 +339,8 @@ from MEC.J import J
 if __name__ == "__main__":
 
     # Assign first two generated users to two EDs
-    lat1, lon1 = in_range_user_coords[0]
-    lat2, lon2 = in_range_user_coords[1]
+    # lat1, lon1 = in_range_user_coords[0]
+    # lat2, lon2 = in_range_user_coords[1]
 
     # eds = [
     #
@@ -378,13 +379,9 @@ if __name__ == "__main__":
 
     for idx, ed in enumerate(eds, start=1):
 
-        print("\n" + "=" * 60)
-        print(f"ED {idx}")
-        #
-        # print("ed.x =", ed.x, type(ed.x))
-        # print("ed.y =", ed.y, type(ed.y))
-        # print("es.x =", es.x, type(es.x))
-        # print("es.y =", es.y, type(es.y))
+        # print("\n" + "=" * 60)
+        # print(f"ED {idx}")
+
 
         initial_distance = HaversineFormula(
             ed.x,
@@ -393,7 +390,7 @@ if __name__ == "__main__":
             es.y
         )
 
-        print(f"Initial Distance: {initial_distance:.2f} m")
+        # print(f"Initial Distance: {initial_distance:.2f} m")
 
         handoff = False
 
@@ -413,11 +410,11 @@ if __name__ == "__main__":
                 es.y
             )
 
-            print(
-                f"Lat={state.x:.6f}, "
-                f"Lon={state.y:.6f}, "
-                f"Distance={dist:.2f} m"
-            )
+            # print(
+            #     f"Lat={state.x:.6f}, "
+            #     f"Lon={state.y:.6f}, "
+            #     f"Distance={dist:.2f} m"
+            # )
 
             if dist > es.coverage_area:
 

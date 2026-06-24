@@ -218,8 +218,26 @@ from Algos.Classes.ESP import ESP, ED
 #     # plt.show()
 #     plt.close()
 
-edge_server_coords_file_path = "./MUA/Dataset/site-optus-melbCBD.csv"
-edge_server_data = pd.read_csv(filepath_or_buffer=edge_server_coords_file_path)
+# edge_server_coords_file_path = "./MUA/Dataset/site-optus-melbCBD.csv"
+# edge_server_data = pd.read_csv(filepath_or_buffer=edge_server_coords_file_path)
+
+import os
+
+
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+
+user_coords_file_path = os.path.join(
+    BASE_DIR,
+    "MUA",
+    "Dataset",
+    "site-optus-melbCBD.csv"
+)
+
+edge_server_data = pd.read_csv(user_coords_file_path)
+
+
+
+
 
 def DisCNN(es:EdgeServer):
 

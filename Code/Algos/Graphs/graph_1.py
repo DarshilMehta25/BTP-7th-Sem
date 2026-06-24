@@ -8,8 +8,8 @@ parent_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # print(parent_dir)
 sys.path.append(parent_dir)
 
-from SingletonUM import SUM
-from ServerRA import SRA
+from Algos.SingletonUM import SUM
+from Algos.ServerRA import SRA
 
 
 # x_values = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15]
@@ -221,4 +221,44 @@ axs[2].grid(True)
 
 plt.tight_layout()
 plt.savefig("no_of_offloadersVSavg_execution_time.png", dpi=300)
+
+
+
+
+
+
+
+
+
+
+#graph for mobility model
+from MEC import DMUA
+
+number_of_devices=DMUA.number_of_mobile_devices_from_NoX
+utility_of_devices=DMUA.utility
+number_of_offloaders=DMUA.offloaders_handoff
+
+fig, axs = plt.subplots(2, 1, figsize=(8, 12))
+
+# MUMS
+axs[0].plot(number_of_offloaders, utility_of_devices,
+            marker='o')
+axs[0].set_title("utility variation")
+axs[0].set_xlabel("Number of EDs")
+axs[0].set_ylabel("Utility")
+axs[0].set_xticks(number_of_offloaders)
+axs[0].grid(True)
+
+# SRA
+axs[1].plot(number_of_offloaders, number_of_offloaders,
+            marker='s')
+axs[1].set_title("SRA")
+axs[1].set_xlabel("Number of EDs")
+axs[1].set_ylabel("Number of Handoffs")
+axs[1].set_xticks(number_of_offloaders)
+axs[1].grid(True)
+
+plt.tight_layout()
+plt.savefig("no_of_edsvshandoffs.png", dpi=300)
 plt.close()
+
