@@ -26,7 +26,12 @@ def maxutil(EDs: List[ED], J: Set[Model], W: float, F: float) -> Model: #utility
     
     if(utility_to_size != dict()): return max(utility_to_size, key=utility_to_size.get)
 
-def MUMS(EDs: List[ED], J: List[Model], W: float, F: float, S: int): 
+def MUMS(EDs: List[ED], J: List[Model], W: float, F: float, S: int):
+
+
+
+    J = J.copy()   # make local copy else giving error of empty list vala in assignment of the model
+
 
     X: Set[Model] = set() #set of cached models
     Nx: List[ED] = []

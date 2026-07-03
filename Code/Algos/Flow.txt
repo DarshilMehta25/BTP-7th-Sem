@@ -107,3 +107,4 @@ If user does not have utility knowledge, calculation has to be done and will lea
 
 To visualize we can create a scatter plot wherein we can show changing coordinates (x,y)
 So every 0.5 seconds it forms a new plot showing new location
+

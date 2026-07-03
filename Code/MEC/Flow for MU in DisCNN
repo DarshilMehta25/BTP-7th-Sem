@@ -15,7 +15,6 @@ MUA wala function banana hain jo lega server, NoX
 Server Utility change as we pass it by reference to function DisCNN
 Yaha se results leke graph me plot karna hain alag se file me
 
-
 Sabse pehle server initialize hoga
 
 1. 20 4 mobile
@@ -23,3 +22,62 @@ Sabse pehle server initialize hoga
 agle iteration sari ki position vapas se reset karni hain
 DisCNN ka kya matlab? saare device andar tab kitni hain
 bahar nikle to utility dec. decresaser
+
+Goal: To simulate incoming and outgoing users and see the effect in Caching Decision
+Plots:
+1. Outgoing EDs vs Models Eliminated from Cached
+2. Incoming EDs vs Models Cached in Server
+3. Scatter Plot to visualize incoming and outgoing users
+
+Flow:
+
+Make a new file DMUA 2
+In that first initialize server with some given location (fixed)
+Then initialize users (some outside and some inside)
+
+We have 2 main types of users: Inside and Outside
+Outside jitne bhi honge saare moving honge
+Example 60 initialize kie EDs total: toh andar 50 usme se 10 moving and bahar 10 saare moving
+Later on we can initialize 100 users half inside and half outside and all moving
+
+Handin and handoff wala abhi nai aayega bcoz wo resources allocated karne pe aayega
+
+For testing purpoes take 5 inside all moving 5 outside all moving
+Simulataneously we have to move them like we did in previous experiment
+Then based on event driven architecture simulation we can cache in our cache out some models.
+
+Changes in MUMS
+For each server class we have to define cached model and the storage will be updated to show remaining storage
+For each server class we have to make property of cached models X from J
+
+If incoming EDs model in X, then do nothing
+It not then check if model can be cached in, then cache it, else not
+For caching out we have to keep track of utility of each cached model in X
+If utility of model drops then we have to swap out with better model or to free memory
+Model should not be swapped out until we have at least one user providing utility with that model in server's area of coverage
+
+
+04-07: Sat
+Make changes in server class and MUMS Algo, or make a new one for MUA scenarios
+Simulate incoming user -> kuch users inner and kuch users outer mese leke unhe ek sath move karo just like real world scenarios, like done previously
+Initialize a list for the same containing users withing server and some outer, user within pe DisCNN chala do
+
+05-07: Sun
+Test changes in MUMS and simulation of incoming -> integrate in DMUA 2 -> test whole simulation with some users
+Matplotlib graph visualization purpose ke lie plot karenge
+First half done
+
+06-07: Mon
+Now dynamically decide and track which Model shd be swapped out bcoz of decreased or no utility -> changes in MUMS algo or done in simulation
+Test with some incoming models of different model (not cached in X), outgoing users of a particular model (cached in X), can be done with 2 models in testing one cached and other not cached and inc size so any model
+occupy whole memory
+
+07-07: Tues
+Test everything with real world users
+Prepare above 3 plots and DMUA 2 file ready
+Second half done
+
+08-08: Wed
+Test explanation, bug fixing
+Presentation
+
