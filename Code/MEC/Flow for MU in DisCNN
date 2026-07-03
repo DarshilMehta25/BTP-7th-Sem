@@ -75,9 +75,12 @@ occupy whole memory
 07-07: Tues
 Test everything with real world users
 Prepare above 3 plots and DMUA 2 file ready
+For plotting purpose make a different file graph 2 in graph_mobile
+Save plots in MEC/Results folder
 Second half done
 
 08-08: Wed
 Test explanation, bug fixing
 Presentation
 
+Make necessary test files in MEC folder and import everything from non test files
