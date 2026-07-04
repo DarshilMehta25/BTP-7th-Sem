@@ -5,13 +5,12 @@ import copy
 from MEC.DisCNN import DisCNN
 from MEC.HaverSineFormula import HaversineFormula
 from typing import List
-from Algos.test import RandomDirectionModel,HaversineFormula
+from Algos.test import RandomDirectionModel
 from dataclasses import replace
 from Algos import test
 
 import threading,time
 from _thread import start_new_thread
-
 from MEC.N import initialize_EDs
 
 # Setting Up Location of Edge Server
@@ -32,9 +31,6 @@ user_coords_file_path = os.path.join(
 )
 
 edge_server_data = pd.read_csv(user_coords_file_path)
-
-
-
 
 edge_server_lats = edge_server_data["LATITUDE"].head(5)  # Edge Server Latitude
 edge_server_longs = edge_server_data["LONGITUDE"].head(5)  # Edge Server Longitude

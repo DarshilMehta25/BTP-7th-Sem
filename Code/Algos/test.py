@@ -20,19 +20,6 @@ from Algos.Classes.ED import ED
 # edge_server_longs = edge_server_data["LONGITUDE"].head(5) #Edge Server Longitude
 # edge_server_coords = pd.DataFrame((edge_server_lats,edge_server_longs)) #Combined coordinates
 
-
-
-
-
-
-
-
-
-
-
-
-
-
 import pandas as pd
 import random
 
@@ -54,16 +41,6 @@ users_data = pd.DataFrame(users, columns=["LATITUDE", "LONGITUDE"])
 #server ki position hardcode ki hai
 server_lat = -37.8136
 server_long = 144.9631
-
-
-
-
-
-
-
-
-
-
 
 # print(users_data)
 # print(*edge_server_lats)
@@ -251,6 +228,7 @@ def _meters_to_lat_long_delta(dx_north_m: float, dy_east_m: float, lat_deg: floa
 
 def RandomDirectionModel(
     ed: ED,
+    # es: EdgeServer,
     duration: Optional[float] = None,
     dt: float = DEFAULT_DT,
     min_speed: float = DEFAULT_MIN_SPEED,
@@ -301,6 +279,8 @@ def RandomDirectionModel(
     # print(type(ed.y)," ",ed.y)
 
     north = ed.x - server_lat
+    # north = ed.x - es.x
+    # east = ed.y - es.y
     east = ed.y - server_long
 
     theta = math.atan2(east, north)

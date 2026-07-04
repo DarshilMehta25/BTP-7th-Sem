@@ -57,6 +57,8 @@ If utility of model drops then we have to swap out with better model or to free 
 Model should not be swapped out until we have at least one user providing utility with that model in server's area of coverage
 
 
+Problem: In test.py Random Direction Model, pass Edge Server as argument, needed in multi edge server scenarios
+
 04-07: Sat
 Make changes in server class and MUMS Algo, or make a new one for MUA scenarios
 Simulate incoming user -> kuch users inner and kuch users outer mese leke unhe ek sath move karo just like real world scenarios, like done previously
