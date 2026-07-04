@@ -9,6 +9,7 @@ from Algos.Classes.EdgeServer import EdgeServer
 from Algos.Classes.ESP import ESP, ED
 import random, copy
 import time
+from MEC import Random_Direction_Model
 
 # eds = EDs
 # offloaders = EDs_SUM
@@ -284,6 +285,7 @@ def DisCNN(es:EdgeServer):
     # server = [EdgeServer(20, 800, 1024, 500)]
     esp = ESP(es)
     EDs = initialize_EDs(es) #EDs initialized as within server placement
+
 
     # print(*EDs)
 

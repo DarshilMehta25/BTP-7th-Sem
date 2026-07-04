@@ -41,7 +41,7 @@ def initialize_EDs(es:EdgeServer): #Function returns list of ED in a server vici
             out_of_range_user_coords.append((user_lat, user_long))
 
     EDs = []
-    for i in range(100):
+    for i in range(50):
         # print(len(J.J))
         ed = ED(
             local_comp_res=random.uniform(10, 15) * 1e9,               # Unif[10, 15] GFLOPS
@@ -74,7 +74,7 @@ def initialize_ED_out(es: EdgeServer): #initialize users out of server range and
             out_of_range_user_coords.append((user_lat, user_long))
 
     EDs = []
-    for i in range(100):
+    for i in range(50):
         # print(len(J.J))
         ed = ED(
             local_comp_res=random.uniform(10, 15) * 1e9,  # Unif[10, 15] GFLOPS

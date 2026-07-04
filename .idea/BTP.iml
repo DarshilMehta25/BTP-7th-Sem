@@ -7,7 +7,7 @@
       <excludeFolder url="file://$MODULE_DIR$/.venv" />
       <excludePattern pattern=".idea" />
     </content>
-    <orderEntry type="jdk" jdkName="Python 3.11 (BTP)" jdkType="Python SDK" />
+    <orderEntry type="jdk" jdkName="Python 3.13 (BTP-7th-Sem-main) (8)" jdkType="Python SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
   </component>
 </module>

@@ -2,27 +2,12 @@ from __future__ import annotations
 import os
 
 from Algos.Classes.EdgeServer import  EdgeServer
-from Classes.ED import ED
 from MEC.N import initialize_EDs, initialize_ED_out
-# from MEC.MUA.test import in_range_user_coords
-# import pandas as pd
-from random import randint
-import math
-from Algos.Classes.ED import ED
-
-# #Base file addresses
-# edge_server_coords_file_path = "./Dataset/site-optus-melbCBD.csv"
-# user_coords_file_path = "./Dataset/users-melbcbd-generated.csv"
-#
-# edge_server_data = pd.read_csv(filepath_or_buffer=edge_server_coords_file_path)
-# users_data = pd.read_csv(filepath_or_buffer=user_coords_file_path) #Already in DF format just have to filter coordinates with server range
-#
-# edge_server_lats = edge_server_data["LATITUDE"].head(5) #Edge Server Latitude
-# edge_server_longs = edge_server_data["LONGITUDE"].head(5) #Edge Server Longitude
 # edge_server_coords = pd.DataFrame((edge_server_lats,edge_server_longs)) #Combined coordinates
 
 import pandas as pd
 import random
+import math
 
 # Edge Server Coordinates (Melbourne CBD approx)
 server_lat = -37.8136
@@ -43,29 +28,6 @@ users_data = pd.DataFrame(users, columns=["LATITUDE", "LONGITUDE"])
 server_lat = -37.8136
 server_long = 144.9631
 
-# print(users_data)
-# print(*edge_server_lats)
-# print(*edge_server_longs)
-# print(edge_server_coords)
-
-# server_lat, server_long = edge_server_coords[0] #Server Coorinates assigned
-# es = EdgeServer(20,800,1024,server_lat,server_long,500) #coverage area kept 500meters can be changed later as per server configuration
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 es = EdgeServer(
     20,
     800,
@@ -75,29 +37,6 @@ es = EdgeServer(
     500
 )
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-# print(es)
-# print(es.coverage_area)
-# print(server_lat)
-# print(server_long)
 
 def HaversineFormula(x1: float, y1: float, x2: float, y2: float) -> float: #returns distance b/w 2 coordinates in meters
 
@@ -112,10 +51,6 @@ def HaversineFormula(x1: float, y1: float, x2: float, y2: float) -> float: #retu
     return c * r * 1000 #multiply with 100 to convert distance to meters
 
 
-# print(user_lat, user_long)
-# print(users_data.iloc[0])
-# print(users_data.shape[0])
-
 in_range_user_coords = [] #list of user coordinates within range of server
 out_of_range_user_coords = [] #list of user coordinates out or range
 
@@ -128,71 +63,9 @@ for i in range(users_data.shape[0]-1):
     else:
         out_of_range_user_coords.append((user_lat, user_long))
 
-# print(*in_range_user_coords)
-# print(*out_of_range_user_coords)
-
-# print(len(in_range_user_coords))
 in_range_user_coords = in_range_user_coords[:20] #list size reduces to number of test users
-# print(len(in_range_user_coords))
-
-# Flow
-# Make a function of random direction where once ED is passed, its coordinates change such that it goes out of range of server within (change every 0.5 sec -> coordinates)
-# 3-6(task deadline) seconds to simulate mobile users
-# No need to pass user coordinates as it is device position independent
-# For using subset of users slice the ED list
-# Make ED instances here from ED class
-# ED ke instance idhar banadena as per requirement jo bhi attribute dalne ho dal dena abhi coordinates change karne se kaam hain
-# This function does not return any value just change user coordinates
-# Replace function use karke ED ko har ek baar pura replicate kar na hoga cuz attributes once defined are freezed
-
-# def RandomDirectionModel(ed: ED):
-#
-#
-#
-#     pass
 
 
-
-
-
-
-
-
-
-
-"""
-random_direction.py
-
-Random Direction Mobility Model (RDM) for mobile Edge Devices (ED), based on:
-
-    P. Nain, D. Towsley, B. Liu, Z. Liu, "Properties of Random Direction Models"
-
-Movement pattern (Sec. II of the paper, generalized to 2D in Sec. IV):
-
-    * At time T_j a new relative direction gamma_j and a new speed s_j are drawn.
-    * The absolute heading evolves additively (eq. 26):
-          theta_j = (theta_{j-1} + gamma_j) mod 2*pi
-    * Position evolves at constant speed during [T_j, T_{j+1}) (eq. 28):
-          X(t) = X(T_j) + s_j * (t - T_j) * (cos theta_j, sin theta_j)
-
-ADAPTATION NOTE: the paper bounds the mobile to [0,1) or [0,1)^2 and handles
-boundary hits via wrap-around (Sec II-A / IV-A) or reflection (Sec II-B / IV-B).
-That doesn't apply here -- EDs roam a real, unbounded lat/long plane around a
-fixed EdgeServer, and we *want* them to be able to leave the coverage circle
-so `initiate_handoff()` has something to react to. So no boundary handling is
-implemented; if you later want EDs confined to a bounding box, the wrap-around/
-reflection formulas (eq. 4/6 in the paper) can be folded in on top of this.
-
-ED is a frozen dataclass, so nothing is mutated in place. Each simulated step
-produces a brand-new ED via dataclasses.replace(), and RandomDirectionModel is
-a *generator* -- it yields a new ED every `dt` seconds. The caller drives the
-loop and decides what to do with each state (store the trajectory, check
-distance to an EdgeServer, trigger initiate_handoff(), etc).
-
-
-
-
-"""
 
 import math
 import random
@@ -216,12 +89,7 @@ MAX_TURN = math.pi / 3         # max heading change per new segment (radians)
 
 
 def _meters_to_lat_long_delta(dx_north_m: float, dy_east_m: float, lat_deg: float) -> tuple[float, float]:
-    """
-    Convert a local-plane displacement in meters (north, east) into a
-    (delta_latitude, delta_longitude) offset in degrees, evaluated at the
-    given latitude (small-displacement approximation, same scale used by
-    a Haversine-based distance check).
-    """
+
     d_lat = (dx_north_m / EARTH_RADIUS_M) * (180.0 / math.pi)
     d_lon = (dy_east_m / (EARTH_RADIUS_M * math.cos(math.radians(lat_deg)))) * (180.0 / math.pi)
     return d_lat, d_lon
@@ -238,62 +106,46 @@ def RandomDirectionModel(
     max_segment: float = DEFAULT_MAX_SEGMENT,
     seed: Optional[int] = None,
 ) -> Iterator[ED]:
-    """
-    Random Direction mobility generator for a single ED.
 
-    Yields a brand-new ED every `dt` seconds with updated (x, y) =
-    (latitude, longitude), for `duration` seconds of simulated time.
-
-    Parameters
-    ----------
-    ed : ED
-        Starting state of the device (must already carry x, y).
-    duration : float, optional
-        Total simulated time in seconds. Defaults to a random value in
-        [3, 6) seconds, matching the "3-6 second" test window you noted.
-    dt : float
-        Coordinate-update granularity in seconds (default 0.5s).
-    min_speed, max_speed : float
-        Speed range (m/s) redrawn at each new movement segment.
-    min_segment, max_segment : float
-        How long (seconds) a (heading, speed) pair is held before a new
-        one is drawn -- T_{j+1} - T_j in the paper's notation.
-    seed : int, optional
-        Seed for a reproducible trajectory (handy for tests).
-
-    Yields
-    ------
-    ED
-        A new ED instance per dt-step, identical to the input except for
-        updated x (latitude) and y (longitude).
-    """
     rng = random.Random(seed)
 
     elapsed = 0.0
     total_time = duration if duration is not None else rng.uniform(3.0, 6.0)
 
-    # theta_0 drawn uniformly in [0, 2*pi) -- matches the paper's stationary
-    # result (Prop. 4.1): start the device "already mixed" in heading.
-    # move initially away from server
-    #
-    # print(type(ed.x)," ",ed.x)
-    # print(type(ed.y)," ",ed.y)
 
-    # north = ed.x - server_lat
-    # print(type(ed.x))
-    # print(type(ed.y))
-    north = ed.x - es.x
-    east = ed.y - es.y
 
-    # east = ed.y - server_long
 
-    theta = math.atan2(east, north)
+
+
+
+    choice = rng.random()
+    base_theta = math.atan2(es.y - ed.y, es.x - ed.x) #edge server
+    if choice < 0.4:
+        # 40% move roughly toward server
+        theta = base_theta + rng.uniform(-math.pi / 6, math.pi / 6)
+
+    elif choice < 0.8:
+        # 40% move roughly away
+        theta = base_theta + math.pi + rng.uniform(-math.pi / 6, math.pi / 6)
+
+    else:
+        # 20% move anywhere
+        theta = rng.uniform(0, 2 * math.pi)
+
+
+
+
+
+
+
+
+
+
+
     speed = rng.uniform(min_speed, max_speed)
     segment_remaining = rng.uniform(min_segment, max_segment)
 
     current = ed
-
-
 
     while elapsed < total_time:
         step = min(dt, total_time - elapsed)
@@ -360,18 +212,13 @@ if __name__ == "__main__":
     # ]
 
 
-    # eds = initialize_EDs(es)
+    eds = initialize_EDs(es)
     eds_out=initialize_ED_out(es)
+    ed_in_out=random.sample(eds,25)+random.sample(eds_out,25)
+    random.shuffle(ed_in_out)
 
 
-    # print(type(eds[0]))
-
-
-    # for ed in eds_out:
-    #     print(ed.id)
-
-
-    for idx, ed in enumerate(eds_out, start=1):
+    for idx, ed in enumerate(ed_in_out, start=1):
 
         # print("\n" + "=" * 60)
         # print(f"ED {idx}")
@@ -410,21 +257,18 @@ if __name__ == "__main__":
             #     f"Distance={dist:.2f} m"
             # )
 
-            if dist > es.coverage_area:
+            if dist <= es.coverage_area:
 
                 print(
-                    f"HAND-IN REQUIRED "
+                    f"HANDOFF REQUIRED "
                     f"(Distance={dist:.2f} m)"
                 )
 
                 handoff = False
                 break
 
-
-
         if not handoff:
-            # print("ED remained inside coverage area")
-            print("ED remained outside coverage area")
+            print("ED remained inside coverage area")
 
 
 

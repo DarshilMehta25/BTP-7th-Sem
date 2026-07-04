@@ -5,7 +5,7 @@ import copy
 from MEC.DisCNN import DisCNN
 from MEC.HaverSineFormula import HaversineFormula
 from typing import List
-from Algos.test import RandomDirectionModel
+from MEC.Random_Direction_Model import RandomDirectionModel
 from dataclasses import replace
 from Algos import test
 
@@ -56,10 +56,10 @@ NoX = DisCNN(es)
 
 # In DMUA.py
 
-from Algos.test import RandomDirectionModel, HaversineFormula
+from Algos.test import HaversineFormula
 
 def initiate_handoff(ed: ED, es: EdgeServer) -> bool:
-    for state in RandomDirectionModel(ed):
+    for state in RandomDirectionModel(ed,es):
 
         dist = HaversineFormula(state.x, state.y, es.x, es.y)
 
@@ -91,15 +91,53 @@ def spawn_threads(eds_chunk, es_ref, results, barrier, start_index, threads):
     spawn_threads(eds_chunk[:mid], es_ref, results, barrier, start_index,       threads)
     spawn_threads(eds_chunk[mid:], es_ref, results, barrier, start_index + mid, threads)
 
+import threading
+print_lock = threading.Lock()
+
+# def _simulate_ed(index, ed, es_ref, results, barrier):
+#     barrier.wait()
+#
+#     dist = HaversineFormula(ed.x, ed.y, es_ref.x, es_ref.y)
+#     with print_lock:
+#         print(f"ID: {ed.id} initial distance = {dist}")
+#
+#     for state in RandomDirectionModel(ed,es):
+#         dist = HaversineFormula(ed.x, ed.y, es_ref.x, es_ref.y)
+#
+#
+#         # if dist > es_ref.coverage_area:
+#         #     results[index] = (True, ed.price_paid)
+#         #     return
+#
+#     with print_lock:
+#         print(f"ID {ed.id} final distance = {dist}")
+#         print("--------------------------------------")
+#
+#     # print("ID",ed.id,"final distance = ", dist)
+#     # print("--------------------------------------")
+#     results[index] = (False, 0)
+
+
+print_lock = threading.Lock()
 
 def _simulate_ed(index, ed, es_ref, results, barrier):
     barrier.wait()
-    for state in RandomDirectionModel(ed, duration=30.0):
-        dist = HaversineFormula(state.x, state.y, es_ref.x, es_ref.y)
-        if dist > es_ref.coverage_area:
-            results[index] = (True, ed.price_paid)
-            return
-    results[index] = (False, 0)
+
+    dist1 = HaversineFormula(ed.x, ed.y, es_ref.x, es_ref.y)
+
+    for state in RandomDirectionModel(ed, es_ref):
+        dist2 = HaversineFormula(state.x, state.y, es_ref.x, es_ref.y)
+
+    with print_lock:
+        print(f"""
+ID = {ed.id}
+Initial = {dist1}
+Final   = {dist2}
+-------------------------
+""")
+
+
+
 
 
 def MUA(NoX: List[ED], es_copy: EdgeServer) -> tuple:
@@ -131,10 +169,15 @@ def MUA(NoX: List[ED], es_copy: EdgeServer) -> tuple:
     return es_copy.Utility, handoff_count, offloaded_eds
 
 
-
-
+from MEC import Random_Direction_Model
+from MEC.N import initialize_ED_out
+import random
 def xyz():
-    all_eds = NoX
+    all_eds = NoX + initialize_ED_out(es)
+    random.shuffle(all_eds)
+
+    print(len(all_eds))
+
     utility = []
     offloaders_handoff = []
 
@@ -142,10 +185,12 @@ def xyz():
 
     for i in range(0,101,10):
 
+
         #threading
         #10 -> [1,2,3,4,5,6,7,8,9,10] -> [1,2,3] || [4,5,6] || [7,8] || [9,10]
         #12 -> 6,6 -> 3,3,3,3 -> min = 2 || 3
         #20 -> 10, 10 -> 5, 5, -> 2,3,2,3
+
 
 
         eds = copy.deepcopy(all_eds[:i])
@@ -157,18 +202,19 @@ def xyz():
         utility.append(float(y_value))
         offloaders_handoff.append(handoff_count)
 
-        print(f"Devices={i}, Utility={y_value:.2f}, Handoffs={handoff_count}")
+
+        # print(f"Devices={i}, Utility={y_value:.2f}, Handoffs={handoff_count}")
     #
-    print("\nUtility:", utility)
-    print("Handoffs per batch:", offloaders_handoff)
+    # print("\nUtility:", utility)
+    # print("Handoffs per batch:", offloaders_handoff)
 
     return utility,offloaders_handoff
 
 #
-# # DMUA.py — do NOT call run() at module level
-# utility = []
-# offloaders_handoff = []
-#
+# DMUA.py — do NOT call run() at module level
+utility = []
+offloaders_handoff = []
+
 # def run():
 #     global utility, offloaders_handoff
 #     es_copy = copy.deepcopy(es)
@@ -177,6 +223,7 @@ def xyz():
 #         y_value, handoff_count, offloaded = MUA(eds, es_copy)
 #         utility.append(float(y_value))
 #         offloaders_handoff.append(handoff_count)
-#
-# if __name__ == "__main__":
-#     run()          # runs only when you execute DMUA.py directly
+
+if __name__ == "__main__":
+    xyz()         # runs only when you execute DMUA.py directly
+    # print("run")

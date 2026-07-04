@@ -40,3 +40,4 @@ EDs_out = initialize_ED_out(es) #server ke bahar
 #     print(HaversineFormula(es.x, eds.x, es.y, eds.y)>es.coverage_area)
 
 #Simlutaneously Move users from inner and outer
+
