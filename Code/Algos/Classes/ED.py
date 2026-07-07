@@ -3,6 +3,18 @@ from typing import Callable
 from Classes.Model import Model
 import numpy as np
 
+
+
+
+
+
+from typing import Callable, ClassVar
+import itertools
+
+
+
+
+
 Ic = 10**(-13) #defined gloabally, average channel coherance time
 
 @dataclass(frozen=True)
@@ -30,6 +42,28 @@ class ED:
 
     ed_counter: int = 0
 
+    """
+    #yea so that every time id change na ho ed ka every time when we call it
+    
+    ek bar run karega jab ed chalega aur fresh permanent id assign karega not chanig every time
+    
+    """
+
+    _id_source: ClassVar[itertools.count] = itertools.count(1)
+
+    def __post_init__(self):
+        if self.ed_counter == 0:
+            object.__setattr__(self, "ed_counter", next(ED._id_source))
+
+
+
+
+
+    """
+    under this mene thoda update kiya hai ed mea
+    """
+
+
     # _previous_instance: Any = field(default=None, repr=False, init=True)
     #
     # def __post_init__(self):
@@ -42,9 +76,24 @@ class ED:
     #
     #             # If the value is different, trigger the function automatically
     #             if old_val != new_val and self.on_change_callback:
+
+
+
+
+    """
+    # @property
+    # def id(self) -> int: ED.ed_counter+=1; return ED.ed_counter
     
+    
+    yea thoda change kiya hai
+    """
+
+
     @property
-    def id(self) -> int: ED.ed_counter+=1; return ED.ed_counter
+    def id(self) -> int:
+        return self.ed_counter
+
+
 
     def local_inference_time(self): #ril
         return sum(self.model.layers.computation_per_layer[:])

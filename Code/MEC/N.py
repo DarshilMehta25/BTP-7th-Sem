@@ -71,7 +71,7 @@ def initialize_ED_out(es: EdgeServer): #initialize users out of server range and
         if (dist <= es.coverage_area):
             in_range_user_coords.append((user_lat, user_long))
         else:
-            out_of_range_user_coords.append((user_lat, user_long))
+            out_of_range_user_coords.append((user_lat, user_long)) #isme out of the coverage area vale EDs aa rhe hai
 
     EDs = []
     for i in range(50):

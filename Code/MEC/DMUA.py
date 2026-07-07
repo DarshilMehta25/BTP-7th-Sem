@@ -1,3 +1,5 @@
+from fontTools.merge.util import current_time
+
 from Algos.Classes.EdgeServer import EdgeServer
 from Algos.Classes.ED import ED
 import pandas as pd
@@ -58,6 +60,16 @@ NoX = DisCNN(es)
 
 from Algos.test import HaversineFormula
 
+
+
+
+
+
+
+
+
+
+
 def initiate_handoff(ed: ED, es: EdgeServer) -> bool:
     for state in RandomDirectionModel(ed,es):
 
@@ -71,6 +83,7 @@ def initiate_handoff(ed: ED, es: EdgeServer) -> bool:
     return False
 
 
+
 def spawn_threads(eds_chunk, es_ref, results, barrier, start_index, threads):
     n = len(eds_chunk)
 
@@ -79,7 +92,13 @@ def spawn_threads(eds_chunk, es_ref, results, barrier, start_index, threads):
         for j, ed in enumerate(eds_chunk):
             t = threading.Thread(
                 target=_simulate_ed,
-                args=(start_index + j, ed, es_ref, results, barrier),
+                args=(
+                    start_index + j,
+                    ed,
+                    es_ref,
+                    results,
+                    barrier
+                ),
                 daemon=True
             )
             threads.append(t)
@@ -88,7 +107,7 @@ def spawn_threads(eds_chunk, es_ref, results, barrier, start_index, threads):
 
     # Recursive case: split in half
     mid = n // 2
-    spawn_threads(eds_chunk[:mid], es_ref, results, barrier, start_index,       threads)
+    spawn_threads(eds_chunk[:mid], es_ref, results, barrier, start_index, threads)
     spawn_threads(eds_chunk[mid:], es_ref, results, barrier, start_index + mid, threads)
 
 import threading
@@ -125,17 +144,36 @@ def _simulate_ed(index, ed, es_ref, results, barrier):
 
     dist1 = HaversineFormula(ed.x, ed.y, es_ref.x, es_ref.y)
 
-    for state in RandomDirectionModel(ed, es_ref):
+    was_inside = dist1 <= es_ref.coverage_area
+
+    did_handoff = False
+    did_handin = False
+
+    for state in RandomDirectionModel(ed, es_ref, duration=30):
         dist2 = HaversineFormula(state.x, state.y, es_ref.x, es_ref.y)
 
-    with print_lock:
-        print(f"""
-ID = {ed.id}
-Initial = {dist1}
-Final   = {dist2}
--------------------------
-""")
+        is_inside = dist2 <= es_ref.coverage_area
 
+        # Hand-off (Inside -> Outside)
+        if was_inside and not is_inside:
+            did_handoff = True
+
+        # Hand-in (Outside -> Inside)
+        if not was_inside and is_inside:
+            did_handin = True
+
+        # Update previous state
+        was_inside = is_inside
+
+    results[index] = (did_handoff, did_handin)
+
+#     with print_lock:
+#         print(f"""
+# ID = {ed.id}
+# Initial = {dist1}
+# Final   = {dist2}
+# -------------------------
+# """)
 
 
 
@@ -145,28 +183,52 @@ def MUA(NoX: List[ED], es_copy: EdgeServer) -> tuple:
     n = len(NoX)
 
     # threading
-    results = [(False, 0)] * n
+    results = [(False, False)] * n
+
+
+
+
     threads = []
     barrier = threading.Barrier(n + 1)
 
-    spawn_threads(NoX, es_copy, results, barrier, 0, threads)  # recursive split
+    spawn_threads(
+        NoX,
+        es_copy,
+        results,
+        barrier,
+        0,
+        threads
+    ) # recursive split
 
     barrier.wait()   # release all threads simultaneously
 
     for t in threads:
         t.join()     # wait for all to finish
 
+
+
+
+
+
+
+
+
+
+
+
     # tally results
     handoff_count = 0
-    offloaded_eds = []
+    handin_count = 0
 
-    for i, (did_handoff, price) in enumerate(results):
+    for did_handoff, did_handin in results:
+
         if did_handoff:
             handoff_count += 1
-            es_copy.Utility -= price
-            offloaded_eds.append(NoX[i])
 
-    return es_copy.Utility, handoff_count, offloaded_eds
+        if did_handin:
+            handin_count += 1
+
+    return es_copy.Utility, handoff_count, handin_count
 
 
 from MEC import Random_Direction_Model
@@ -180,6 +242,7 @@ def xyz():
 
     utility = []
     offloaders_handoff = []
+    offloaders_handin=[]
 
     time_stamp = []
 
@@ -197,10 +260,11 @@ def xyz():
         # print(*eds)
         es_copy = copy.deepcopy(es)
 
-        y_value, handoff_count, offloaded = MUA(eds, es_copy)
+        y_value, handoff_count,handin_count = MUA(eds, es_copy)
 
         utility.append(float(y_value))
         offloaders_handoff.append(handoff_count)
+        offloaders_handin.append(handin_count)
 
 
         # print(f"Devices={i}, Utility={y_value:.2f}, Handoffs={handoff_count}")
@@ -208,12 +272,13 @@ def xyz():
     # print("\nUtility:", utility)
     # print("Handoffs per batch:", offloaders_handoff)
 
-    return utility,offloaders_handoff
+    return utility,offloaders_handoff,offloaders_handin
 
 #
 # DMUA.py — do NOT call run() at module level
 utility = []
 offloaders_handoff = []
+offloaders_handin=[]
 
 # def run():
 #     global utility, offloaders_handoff
@@ -225,5 +290,19 @@ offloaders_handoff = []
 #         offloaders_handoff.append(handoff_count)
 
 if __name__ == "__main__":
-    xyz()         # runs only when you execute DMUA.py directly
+    utility, offloaders_handoff, offloaders_handin = xyz()
+
+    print("\n" + "=" * 70)
+    print(f"{'No. of EDs':<12}{'Handoff':<12}{'Hand-in':<12}")
+    print("=" * 70)
+
+    for devices, handoff, handin in zip(
+            range(0, 101, 10),
+            offloaders_handoff,
+            offloaders_handin):
+
+        print(f"{devices:<12}{handoff:<12}{handin:<12}")
+
+    print("=" * 70)
+
     # print("run")

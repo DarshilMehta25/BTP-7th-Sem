@@ -95,6 +95,29 @@ def _meters_to_lat_long_delta(dx_north_m: float, dy_east_m: float, lat_deg: floa
     return d_lat, d_lon
 
 
+
+
+
+"""
+
+1. Random Direction Model 
+ 
+ 
+Why? -> to change the eds coordinates -> dynamic scenerio create karne ke lie
+How? -> step1. initial distance hoga ed ka edge server se - call it as d1 and coordinates as (x1,y1)
+        step2. 
+
+
+
+
+
+
+"""
+
+
+
+
+
 def RandomDirectionModel(
     ed: ED,
     es: EdgeServer,
@@ -107,15 +130,33 @@ def RandomDirectionModel(
     seed: Optional[int] = None,
 ) -> Iterator[ED]:
 
+
+    #concept of seed
     rng = random.Random(seed)
 
     elapsed = 0.0
-    total_time = duration if duration is not None else rng.uniform(3.0, 6.0)
+    total_time = duration if duration is not None else rng.uniform(3.0, 6.0) #seelct karega randomly ki kitne time tak ed move kar , final cordinates kya hoge after  this time === main moto
 
 
 
 
-
+    """
+    
+    1. my thetha of edge server vo fix hai, humne fix kar rkha hai -> means theta also fix
+    2. possibilities kya chihye aapne proj mea -> eds move kare across all the directions 
+                                a. vo toh phele bhi kar rhi thi -> north east wale mea? what is different -> direction reverse!!!!!!
+                                b. theta ka use karke hum direction bhi reverse kar rhe hai uske extra kuch nhi karna pad rha 
+                                        for that reason humne theta ka concept use kiya
+                                
+                                THETA KA CONCEPT KYA HAI YHA
+                                    i changed theta for every ed in such a way so that
+                                    i) 40% ed towards server jaye -> means inside the coverage area they will approach
+                                    ii) 40% will move away from the coverage area
+                                    iii) 20% will choose randomly their way of movement
+                                
+                            so that we will be able to cover all the possible scenerios -> system ko dynamic bna sake
+                                
+    """
 
 
     choice = rng.random()
@@ -133,14 +174,42 @@ def RandomDirectionModel(
         theta = rng.uniform(0, 2 * math.pi)
 
 
-
-
-
-
-
-
-
-
+    """
+    
+    
+    speed = distance / time
+    distance = speed * time
+    
+    speed yea choose btw => 50 - 100 m/s 
+    
+    1. while loop will -> elapsed check karega abhi iska kitna time remaining hai aur kab tak iske direc or coord change karne to get final one
+    2. step choose karega randomly btw min (0.5 or the left time) 
+    3. dist_m = speed * time (speed = randomly chosen between min_speed and max_speed (50-100m/s))
+    4. fir us distance ko theta change karega  -> distance ko polar coordinate mea change kar rha hai
+    5. convert the distance into lat, long using meter_to_lat_long_delta
+    
+    
+    
+    
+    Segement ka kya concept hai
+            - segment ek time hai for which the ed continue to move in the same direction for a while (until the segment finishes)
+            - after the segment finished and the time is still remaining for the ed to change its coordinates so it will change its current position by a theta
+            - it will create new segment means aab yea nye theta se move karga for the next segment
+            
+    
+    in conclusion
+        ed aapna speed decide karega jisse wo run karega, 
+        segment decide karega ki kitne time tak us direction mea run karna hai, 
+        step decide karega ka ki kitne step se move karna hai
+        
+        1. aur for the time total_time (let say ed choose kiya 5 sec)
+        2. speed decide karunge kya hogi (let say 60 m/s)
+        3. segment decide karega ( let say 2sec ) 2sec tak wo same dir mea motion karega and after seg end theta changa ed ka for the next segmebent 
+                total_time = 5sec => 0-2sec (1st dir) => 2-4sec (2nd dir) => 4-5sec (3rd dir)
+        4. in the end of the 5th sec we are having the final coordinates of the ed
+         
+    
+    """
 
     speed = rng.uniform(min_speed, max_speed)
     segment_remaining = rng.uniform(min_segment, max_segment)
@@ -148,18 +217,24 @@ def RandomDirectionModel(
     current = ed
 
     while elapsed < total_time:
-        step = min(dt, total_time - elapsed)
+
+
+        step = min(dt, total_time - elapsed) #check for 0.5 or remaining time if less then 0.5 so choose step accordingly
 
         # advance position for this micro-step at the current (theta, speed)
-        dist_m = speed * step
+        dist_m = speed * step   # (50-100 m/s rand * step)
         dx_north = dist_m * math.cos(theta)   # ED.x == latitude  == north
         dy_east = dist_m * math.sin(theta)    # ED.y == longitude == east
-        d_lat, d_lon = _meters_to_lat_long_delta(dx_north, dy_east, current.x)
+        d_lat, d_lon = _meters_to_lat_long_delta(dx_north, dy_east, current.x) #converting the distance into lat long
 
         current = replace(current, x=current.x + d_lat, y=current.y + d_lon)
         elapsed += step
         segment_remaining -= step
 
+
+
+        #update 3->
+        #yeild current ki jagah...elapsed time bhi dekh lenge
         yield current
 
         # time for a new relative direction / speed? (this is a T_j event)
@@ -212,18 +287,41 @@ if __name__ == "__main__":
     # ]
 
 
-    eds = initialize_EDs(es)
-    eds_out=initialize_ED_out(es)
-    ed_in_out=random.sample(eds,25)+random.sample(eds_out,25)
+    eds = initialize_EDs(es) #eds inside coverage area
+    eds_out=initialize_ED_out(es) #eds outside coverage area
+    ed_in_out=random.sample(eds,25)+random.sample(eds_out,25) #dono ko add kar and then shuffle -> random inside + outside coverage area
     random.shuffle(ed_in_out)
+
+    #mark this as update 1 darshil
+    # coverage_snapshots = {} #to get the snapshot of eds in the coverage area of the edge server
+
 
 
     for idx, ed in enumerate(ed_in_out, start=1):
 
+
+        """
+        
+        1. mujhe har ed uski coordinates hai vo change karne hai after sometime 
+           s.t. yea dynamic lge
+        2. uske lihye ed_in_out list usme se iterate kar rhe hai one by one 
+        3. kya kar rhe hai ? -> har ed kar after sometime coordinate change kar rhe hai
+        4. threading use kar rhee hai jisme 10-10 patch [ed1,ed2,...ed10] rhega aur har kuch list eg. 50 eds - ideally 5 thread banegi
+        5. return after sometime distance from edge server se [ new coordinates ]
+        6. har ed ka apna ek initial distance initalized hai, initial coordinate hai....
+            ed in ke liye indide mea
+            ed out ke liye outside coverage area
+            
+            
+            
+        """
+
+
+
         # print("\n" + "=" * 60)
         # print(f"ED {idx}")
 
-
+        #intial distance calc from edge server of ed
         initial_distance = HaversineFormula(
             ed.x,
             ed.y,
@@ -231,11 +329,16 @@ if __name__ == "__main__":
             es.y
         )
 
+        #update 2 ->
+        #current simulation time ed ka
+        # current_time = round(RandomDirectionModel.DEFAULT_DT if False else 0, 1)
+
+
         # print(f"Initial Distance: {initial_distance:.2f} m")
 
         handoff = True
 
-        for state in RandomDirectionModel(ed,es):
+        for state in RandomDirectionModel(ed,es): #update 4-> every time after running we checking for curr time as well
 
             # print("ed.x =", state.x, type(ed.x))
             # print("ed.y =", state.y, type(ed.y))
@@ -250,6 +353,24 @@ if __name__ == "__main__":
                 es.x,
                 es.y
             )
+
+
+
+            # #update 5->
+            # #snapshot add kar rha hai for ed
+            # #afar kuch aur details chahiye then update it from here @darshil
+            # if current_time not in coverage_snapshots:
+            #     coverage_snapshots[current_time] = []
+            #
+            # if dist <= es.coverage_area:
+            #     coverage_snapshots[current_time].append({
+            #         "ed_id": idx,
+            #         "state": state,
+            #         "distance": dist
+            #     })
+
+
+
 
             # print(
             #     f"Lat={state.x:.6f}, "
@@ -270,8 +391,30 @@ if __name__ == "__main__":
         if not handoff:
             print("ED remained inside coverage area")
 
+        # print(sorted(coverage_snapshots.keys()))
+
 
 
 
     #let us now generalize this
     # x = len(eds)
+
+
+
+
+
+
+"""
+
+#12:00PM 07-07-2026
+
+1. after ever 0.5 how many eds are there in the coverage are (list of the ed -> particular ed)
+2. how many are doing handoff after ever 0.5 sec
+3. how many are doing hand-in after ever 0.5 sec
+
+
+After every 0.5s: Number of EDs handin, 
+Number of Eds handoff, 
+List of particular ED in form of List which are inside server area at particular instance of time
+
+"""

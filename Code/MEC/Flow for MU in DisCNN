@@ -54,7 +54,9 @@ If incoming EDs model in X, then do nothing
 It not then check if model can be cached in, then cache it, else not
 For caching out we have to keep track of utility of each cached model in X
 If utility of model drops then we have to swap out with better model or to free memory
+
 Model should not be swapped out until we have at least one user providing utility with that model in server's area of coverage
+
 
 
 Problem: In test.py Random Direction Model, pass Edge Server as argument, needed in multi edge server scenarios
