@@ -15,7 +15,7 @@ def pot_offloaders(EDs: List[ED], model: Model) -> Set[ED]: #list of potential o
     Nx = {device for device in EDs if(device.model.name == model.name)}
     return Nx
 
-def maxutil(EDs: List[ED], J: Set[Model], W: float, F: float) -> Model: #utility calculate kese ki hain ke jitne device ko model chahie
+def maxutil(EDs: List[ED], J: Set[Model], W: float, F: float) -> Model: #utility calculate
     utility_to_size = dict()
 
     for model in J:
@@ -28,10 +28,7 @@ def maxutil(EDs: List[ED], J: Set[Model], W: float, F: float) -> Model: #utility
 
 def MUMS(EDs: List[ED], J: List[Model], W: float, F: float, S: int):
 
-
-
     J = J.copy()   # make local copy else giving error of empty list vala in assignment of the model
-
 
     X: Set[Model] = set() #set of cached models
     Nx: List[ED] = []

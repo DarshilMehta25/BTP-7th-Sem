@@ -9,6 +9,9 @@ from Algos.Classes.EdgeServer import EdgeServer
 from Algos.Classes.ESP import ESP, ED
 import random, copy
 import time
+from typing import Set, List
+from Algos.Classes.Model import Model
+from Algos.MUMS import utilized_storage
 from MEC import Random_Direction_Model
 
 # eds = EDs
@@ -274,7 +277,9 @@ edge_server_data = pd.read_csv(user_coords_file_path)
 
 
 
-def DisCNN(es:EdgeServer):
+def DisCNN(es:EdgeServer,
+           EDs: List[ED]
+           ):
 
     # edge_server_lats = edge_server_data["LATITUDE"].head(5)  # Edge Server Latitude
     # edge_server_longs = edge_server_data["LONGITUDE"].head(5)  # Edge Server Longitude
@@ -284,7 +289,7 @@ def DisCNN(es:EdgeServer):
 
     # server = [EdgeServer(20, 800, 1024, 500)]
     esp = ESP(es)
-    EDs = initialize_EDs(es) #EDs initialized as within server placement
+    # EDs = initialize_EDs(es,50) #EDs initialized as within server placement
 
 
     # print(*EDs)
@@ -302,8 +307,19 @@ def DisCNN(es:EdgeServer):
     #     transmision_antenna_power_eff_param=0.90
     # )]
 
-    X, NxO, es.Utility = esp.MUMS(EDs, J, 20, 800, 1024) #Model Caching Decision
+    es.X, NxO, es.Utility = esp.MUMS(EDs, J, 20, 800, 1024) #Model Caching Decision
     _, Wi_List, Fi_List, no_offloaders = esp.SRA(NxO,20,800) #Resource Allocation to EDs maximizing utility of ESP
+
+    es.X = {eds.model for eds in NxO} #Faltu me cache kie hue models nikal jae
+
+    # X = {eds.model for eds in NxO}
+    # print(X)
+    # print(es.X)
+    # X = es.X.intersection(X)
+    # print(X)
+    # print(es.X)
+    # es.X = X
+    # print(es.X)
 
     # print(len(X))
     # print(len(NxO))
@@ -319,5 +335,8 @@ def DisCNN(es:EdgeServer):
     # print(*NxO)
 
 if __name__ == "__main__":
-    Simulate() #For Simulation
-    # DisCNN(es) #For actual Model Caching and Resource Allocation
+    # Simulate() #For Simulation
+    DisCNN(es) #For actual Model Caching and Resource Allocation
+    # print(models.name for models in es.X)
+    # print(es.X)
+    # print(utilized_storage(es.X))

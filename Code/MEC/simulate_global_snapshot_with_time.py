@@ -5,13 +5,17 @@ import threading
 from typing import List, Dict, Tuple
 
 import pandas as pd
-
+from DMUMS import DMUMS
 from Algos.Classes.EdgeServer import EdgeServer
 from Algos.Classes.ED import ED
+from Classes.ED import ED
+from Classes.Model import Model
+# from Graphs.graph_1 import number_of_devices
 from MEC.HaverSineFormula import HaversineFormula
 from MEC.Random_Direction_Model import RandomDirectionModel
 from MEC.DisCNN import DisCNN
 from MEC.N import initialize_EDs, initialize_ED_out
+import matplotlib.pyplot as plt
 
 
 """
@@ -60,17 +64,17 @@ edge_server_longs = edge_server_data["LONGITUDE"].head(5)
 edge_server_coords = pd.DataFrame((edge_server_lats, edge_server_longs))
 
 server_lat, server_long = edge_server_coords[0]
-es = EdgeServer(
-    20,
-    800,
-    1024,
-    server_lat,
-    server_long,
-    800  # server ka range meters mea
-)
+# es = EdgeServer(
+#     20,
+#     800,
+#     1024,
+#     server_lat,
+#     server_long,
+#     800  # server ka range meters mea
+# )
 
-NoX = DisCNN(es)  # model caching + resource allocation ke baad ke offloaders
-
+# NoX = DisCNN(es)  # model caching + resource allocation ke baad ke offloaders
+# number_of_devices = []
 
 # Single global-clock simulation -> yehi mera naya function hai
 
@@ -79,7 +83,7 @@ def simulate_global_coverage(
     es_ref: EdgeServer,
     dt: float = 0.5,
     max_time: float = 10.0,
-) -> Tuple[Dict[float, List[int]], Dict[float, List[ED]]]:
+) -> Dict[float, List[int]]:
     """
 
     step1. saare EDs ko ek single global clock ke sath simulate karo,
@@ -205,8 +209,8 @@ def simulate_global_coverage(
     for t in threads:
         t.start()
 
-    global_snapshots: Dict[float, List[int]] = {}
-    global_snapshots_states: Dict[float, List[ED]] = {}
+    global_snapshots: Dict[float, List[ED]] = {}
+    # global_snapshots_states: Dict[float, List[ED]] = {}
 
     # step5. main thread yaha har tick ko release karega aur result collect karega
     for step in range(1, n_steps + 1):
@@ -215,11 +219,11 @@ def simulate_global_coverage(
         step_barrier.wait()  # ab sabko is tick ke lie chalne do
         done_barrier.wait()  # sabka kaam khatam hone ka wait karo
 
-        inside_ids = [sid for (inside, sid, _state) in tick_result if inside]
-        inside_states = [state for (inside, _sid, state) in tick_result if inside]
+        inside_ids = [state for (inside, sid, state) in tick_result if inside]
+        # inside_states = [state for (inside, _sid, state) in tick_result if inside]
 
         global_snapshots[t_stamp] = inside_ids
-        global_snapshots_states[t_stamp] = inside_states
+        # global_snapshots_states[t_stamp] = inside_states
 
     for t in threads:
         t.join()
@@ -227,18 +231,19 @@ def simulate_global_coverage(
     # step6. dono dicts ko tuple mea return kar rahe hai - koi function
     # attribute wala hack nhi, seedha proper return, dono dict clean
     # rehte hai aur function dobara call karne pe overwrite nhi hote
-    return global_snapshots, global_snapshots_states
-
-
-
+    return global_snapshots
 
 # Runner -> yaha se sab chalu hoga
 
-def run(max_time: float = 10.0, dt: float = 0.5):
+def run(
+        NoX: List[ED] , eds_out: List[ED], es: EdgeServer,
+        max_time: float = 10.0, dt: float = 0.5
+        ):
 
     # step1. saare EDs le lo - jo NoX (offloaders, andar wale) hai + jo
     # bahar (out of range) hai unko bhi mila do, phir shuffle kar do
-    all_eds = NoX + initialize_ED_out(es)
+    # all_eds = NoX + initialize_ED_out(es,50)
+    all_eds = NoX + eds_out
     random.shuffle(all_eds)
 
     print(f"Total EDs = {len(all_eds)}")
@@ -249,39 +254,56 @@ def run(max_time: float = 10.0, dt: float = 0.5):
 
     # step3. ab single global clock wali simulation chalao -> ab dono
     # milenge, ids wala dict aur ED objects wala dict, saath mea
-    snapshots, snapshot_states = simulate_global_coverage(
+    snapshots = simulate_global_coverage(
         eds, es_copy, dt=dt, max_time=max_time
     )
 
     # step4. print kar do result (ids + coordinates dono)
-    print_snapshots(snapshots, snapshot_states)
+    for t in sorted(snapshots):
+        # print(len(snapshots[t]))
+        # number_of_devices.append((len(snapshots[t])))
+        print(f"\n{t:.1f} sec:")
+        DMUMS(es, snapshots[t])
 
-    return snapshots, snapshot_states
+    # plt.plot(snapshots.keys(), number_of_devices, marker="o")
+    # plt.xlabel("Time of 0.5s interval")
+    # plt.ylabel("Number of EDs inside coverage area of server")
+    # plt.title("DMU scenario for 50 EDs inside and outside")
+    # plt.savefig('./Results/DMU_50.png', dpi=150)
+    # print_snapshots(snapshots)
 
+    # return snapshots
 
-
-
-
+# class PrintHelp:
+#     def __init__(self, ed_id, model):
+#         self.ed_id = ed_id
+#         self.model = model
 
 #yhe se dekh lena agar aur kuch chiye toh @darshil
 
-def print_snapshots(
-    snapshots: Dict[float, List[int]],
-    snapshot_states: Dict[float, List[ED]] = None,
-) -> None:
-    # bas print karne ka kaam
+import time
+
+def print_snapshots(snapshots):
+    print("\nSnapshots:")
+
+    eds_at_time = {}
+
     for t in sorted(snapshots):
-        print(f"\n========== Time = {t:.1f} sec ==========")
-        print(f"Number of EDs inside = {len(snapshots[t])}")
-        print("ED inside the coverage area (ids):", snapshots[t])
-
-        # agar ED objects bhi diye hai toh unke coordinates bhi dikha do
-        if snapshot_states is not None:
-            coords = [(ed.x, ed.y) for ed in snapshot_states[t]]
+        eds_at_time[t] = list(snapshots[t])  # or [ed for ed in snapshots[t]]
 
 
+    # for t in sorted(snapshots):
+    #     # print(len(snapshots[t]))
+    #     # lst = [PrintHelp(ed.id, ed.model) for ed in snapshots[t]]
+    #     #
+    #     # print(f"\n{t:.1f} sec:")
+    #     # print([f"ED {x.ed_id} ({x.model.name})" for x in lst])
+    #
+    #     lst=[eds_with_time(ed,t) for ed in snapshots[t]]
 
-
+    for t, eds in eds_at_time.items():
+        print(len(eds))
+        print(f"{t:.1f} sec -> {[f'ED {ed.id} ({ed.model.name})' for ed in eds]}")
 
 
 if __name__ == "__main__":

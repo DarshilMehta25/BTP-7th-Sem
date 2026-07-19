@@ -51,7 +51,8 @@ es = EdgeServer(
 # print(es)
 
 # Offloaders taken after model caching, utility maximization and resource allocation at t=0
-NoX = DisCNN(es)
+EDs = initialize_EDs(es,50)
+NoX = DisCNN(es, EDs)
 # print(*NoX)
 
 # print(es) #Server Utility changes as it is passed by reference to DisCNN function
@@ -59,16 +60,6 @@ NoX = DisCNN(es)
 # In DMUA.py
 
 from Algos.test import HaversineFormula
-
-
-
-
-
-
-
-
-
-
 
 def initiate_handoff(ed: ED, es: EdgeServer) -> bool:
     for state in RandomDirectionModel(ed,es):
@@ -81,8 +72,6 @@ def initiate_handoff(ed: ED, es: EdgeServer) -> bool:
             return True
 
     return False
-
-
 
 def spawn_threads(eds_chunk, es_ref, results, barrier, start_index, threads):
     n = len(eds_chunk)
@@ -175,18 +164,12 @@ def _simulate_ed(index, ed, es_ref, results, barrier):
 # -------------------------
 # """)
 
-
-
-
 def MUA(NoX: List[ED], es_copy: EdgeServer) -> tuple:
 
     n = len(NoX)
 
     # threading
     results = [(False, False)] * n
-
-
-
 
     threads = []
     barrier = threading.Barrier(n + 1)
@@ -204,17 +187,6 @@ def MUA(NoX: List[ED], es_copy: EdgeServer) -> tuple:
 
     for t in threads:
         t.join()     # wait for all to finish
-
-
-
-
-
-
-
-
-
-
-
 
     # tally results
     handoff_count = 0
@@ -235,7 +207,7 @@ from MEC import Random_Direction_Model
 from MEC.N import initialize_ED_out
 import random
 def xyz():
-    all_eds = NoX + initialize_ED_out(es)
+    all_eds = NoX + initialize_ED_out(es,50)
     random.shuffle(all_eds)
 
     print(len(all_eds))

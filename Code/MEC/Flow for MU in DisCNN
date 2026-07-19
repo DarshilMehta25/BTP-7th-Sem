@@ -88,3 +88,37 @@ Test explanation, bug fixing
 Presentation
 
 Make necessary test files in MEC folder and import everything from non test files
+
+
+Flow for Dynamic Cache Decision:
+Cache - 2
+Example 10 device jinhe resource de rakhe hain DisCNN chala rakah inpe
+Bahar se aaye 5
+Bahar gaye kitne 5
+Snapshot cache model m1, m2 -> Nm1, Nm2 (offloaders jinhe vo model chahie)
+Bahar se aaye m3 model chahie -> 5 ke 5 hain vo bane Nm3
+Abb Nm1, Nm2 mein mobility ke karan change hoga
+Snapshot ke hisaab se ham karenege
+Server ke andar jitne bhi device hain usme hum DMUMS chalayenge
+DMUMS vs MUMS -> MUMS static allocation, dusrs MUMS poora cache initially khali usko vo bharta tha
+DMUMS -> cache modification while maintain service quality
+Jitne device hain unpy hum loop chlayenge aur dekhenge kaun naya hain utility - 0
+Usme bhi cache model ki hi demand hogi -> toh unhe SUM, SRA resource allocate karne hain
+Ab worst case -> 2 condition hogi
+Server me jagah hain to model aa sakta hain utni to cache kardo - kuch nikala nai hain - future me saare models ki demand aagayi to hame Model Caching me change nai hoga
+Ab worst most model ke lie jagah nai he - storage allocation zyada hai
+To jo model ka utilization kaam hai usse naye model ko replace kardo
+
+Ex - m2 ko replace kardo m3 SUM/model storage MUMS me thi
+Strategy to replace Model: LUO
+
+X = {m1,m2,m3,m4}
+Demand m5
+replace karna padega kyuki jagah nai hain
+m5 ki storage = m1 + m2 ka storage
+To hame m1,m2 replace karke m5 lana hain to do ki combine util kam honi chahie as compared to m5
+
+Cache Server Storage = 1000 MB
+Occupied 950
+New Model = 200
+List of Model milenge jo pehle se jayenge cache mein

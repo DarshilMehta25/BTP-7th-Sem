@@ -27,7 +27,6 @@ class ED:
     transmission_power: float #pi
     energy_consumption_param: float #kil
     transmision_antenna_power_eff_param: float #Bi #in milli watts
-    # on_location_change: Callable
 
     # '''
     # Coordinates of mobile user
@@ -62,24 +61,7 @@ class ED:
     """
     under this mene thoda update kiya hai ed mea
     """
-
-
-    # _previous_instance: Any = field(default=None, repr=False, init=True)
-    #
-    # def __post_init__(self):
-    #     # If a previous instance was passed, check what changed
-    #     if self._previous_instance is not None:
-    #         tracked_fields = ['', 'humidity']
-    #         for field_name in tracked_fields:
-    #             old_val = getattr(self._previous_instance, field_name)
-    #             new_val = getattr(self, field_name)
-    #
-    #             # If the value is different, trigger the function automatically
-    #             if old_val != new_val and self.on_change_callback:
-
-
-
-
+    
     """
     # @property
     # def id(self) -> int: ED.ed_counter+=1; return ED.ed_counter

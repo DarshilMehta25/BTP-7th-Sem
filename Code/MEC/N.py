@@ -1,7 +1,7 @@
 from Algos.Classes.ED import ED
 import random
 from Algos.Classes.EdgeServer import EdgeServer
-from MEC import J
+from MEC.J import J
 import pandas as pd
 from MEC.HaverSineFormula import HaversineFormula
 # from test2 import EDs
@@ -29,8 +29,8 @@ users_data = pd.read_csv(user_coords_file_path)
 in_range_user_coords = [] #list of user coordinates within range of server
 out_of_range_user_coords = [] #list of user coordinates out or range
 
-def initialize_EDs(es:EdgeServer): #Function returns list of ED in a server vicinity
-
+def initialize_EDs(es:EdgeServer, n: int): #Function returns list of ED in a server vicinity
+    J_ = J[0:11]
     for i in range(users_data.shape[0] - 1):
         user_lat, user_long = users_data.iloc[i]
         dist = HaversineFormula(user_lat, user_long, es.x, es.y)
@@ -41,11 +41,11 @@ def initialize_EDs(es:EdgeServer): #Function returns list of ED in a server vici
             out_of_range_user_coords.append((user_lat, user_long))
 
     EDs = []
-    for i in range(50):
+    for i in range(n):
         # print(len(J.J))
         ed = ED(
             local_comp_res=random.uniform(10, 15) * 1e9,               # Unif[10, 15] GFLOPS
-            model=random.choice(J.J),                                           # Models assigned randomly
+            model=random.choice(J_),                                           # Models assigned randomly
             task_deadline=random.uniform(3, 6),                        # Unif[3, 6] s
             channel_coefficient=random.uniform(0.1, 1.0),              # Unif[0.1, 1]
             transmission_power=random.uniform(10, 100) * 1e-3,         # Unif[10, 100] mW
@@ -62,8 +62,8 @@ def initialize_EDs(es:EdgeServer): #Function returns list of ED in a server vici
 
     return EDs
 
-def initialize_ED_out(es: EdgeServer): #initialize users out of server range and returns a list of users
-
+def initialize_ED_out(es: EdgeServer, n:int): #initialize users out of server range and returns a list of users
+    J_ = J[11:14]
     for i in range(users_data.shape[0] - 1):
         user_lat, user_long = users_data.iloc[i]
         dist = HaversineFormula(user_lat, user_long, es.x, es.y)
@@ -74,11 +74,11 @@ def initialize_ED_out(es: EdgeServer): #initialize users out of server range and
             out_of_range_user_coords.append((user_lat, user_long)) #isme out of the coverage area vale EDs aa rhe hai
 
     EDs = []
-    for i in range(50):
+    for i in range(n):
         # print(len(J.J))
         ed = ED(
             local_comp_res=random.uniform(10, 15) * 1e9,  # Unif[10, 15] GFLOPS
-            model=random.choice(J.J),  # Models assigned randomly
+            model=random.choice(J_),  # Models assigned randomly
             task_deadline=random.uniform(3, 6),  # Unif[3, 6] s
             channel_coefficient=random.uniform(0.1, 1.0),  # Unif[0.1, 1]
             transmission_power=random.uniform(10, 100) * 1e-3,  # Unif[10, 100] mW

@@ -77,4 +77,31 @@ densenet = Model(
     layers=layer(121)
 )
 
-J = [googlenet,mobilenet,resnet18,resnet34,resnet50,alexnet,inceptionv3,vgg16,vgg19,densenet]
+inception_resnet_v2 = Model(
+    name="InceptionResNetV2",
+    storage = 215,
+    layers = layer(164)
+)
+
+efficientnet_b0 = Model(
+    name="EfficientNetB0",
+    storage = 21,
+    layers = layer(82)
+)
+
+convnext = Model(
+    name="ConvNeXt",
+    storage = 110,
+    layers = layer(55)
+)
+
+squeezenet = Model(
+    name="SqueezeNet",
+    storage = 5,
+    layers = layer(26)
+)
+
+J = [googlenet,mobilenet,resnet18,resnet34,resnet50,alexnet,inceptionv3,vgg16,vgg19,densenet,inception_resnet_v2,efficientnet_b0,convnext,squeezenet] #14 Models
+J.sort(key = lambda model: model.storage) #to store models according to increasing storage size
+# print([(model.name, model.storage) for model in J]) #to confirm whether list is ordered on the basis of specified criteria
+# print(J[10:11])

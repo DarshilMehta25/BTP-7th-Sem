@@ -1,0 +1,26 @@
+Global Static List of EDs connected to Edge Server for collaborative inference
+
+Inputs:
+    1 Snapshot of EDs (all EDs present inside coverage area at this time),
+    2 Details of Edge Server (kitne models cached hain at this time)
+
+2 Details of all models along with EDs that are in the region currently and demanding it
+3 Now I need to find out EDs which are handed in the edge server
+4 Now I will compare the EDs which are present in Edge Server region currently and previously with help of Global Model Caching List + Edge Server dereference (current EDs in region)
+5 Now I will find out EDs which have handed off and handed in call it list hand off and hand in
+6 Check handin EDs mein konse naye models hain (handin new models)
+7 Similarly handoff EDs models
+8 Now find how many EDS accessing a corresponding models dict of models and EDs as values
+9 Now I will choose greedily which model to cache and to swap out aur uske lie bana lenge matrix
+10 Matrix (1. Number of EDs, 2. Storage, 3. Marginal Utility per Model (wrt to EDs jinhe wo model chahie))
+(Number of Models are still limited and in worst case we need all EDs of list for corresponding model in that case still it will tend towards nearly O(k*n) which is O(n)
+11 Now based on above matrix we get list of Models in non-increasing order Model Utility X
+12 Now we will have temp list on basis of 0-1 knapsack allocate storage to Models (cache and swap on this basis)
+13 Now we will update the Global list of EDs in Edge Server
+14 We will modify edge server ka cache based on temp list (we will use LRU strategy)
+
+Assumption:
+1: Har Edge Server ke corresponding ek static list hogi, kitni EDs edge server ke range mein hain
+2: Isko initialize karenge with global snapshot
+3: We will defined a parameter corresponding to each edge server 0-100 based on certain matrix which will help EDs to know which edge server to access
+4: ED directly Edge Server ko query karke cached model ki list lega for taking better decisions
