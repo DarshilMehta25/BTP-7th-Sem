@@ -1,5 +1,4 @@
 from dataclasses import dataclass, field
-from typing import Callable
 from Classes.Model import Model
 import numpy as np
 
@@ -10,10 +9,6 @@ import numpy as np
 
 from typing import Callable, ClassVar
 import itertools
-
-
-
-
 
 Ic = 10**(-13) #defined gloabally, average channel coherance time
 

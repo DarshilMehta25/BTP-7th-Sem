@@ -53,7 +53,9 @@ for i in range(10,51,5): #10 ke gap mein EDs initialize honge andar bahar
     EDs_in = initialize_EDs(es,i) #i jitne andar
     EDs_out = initialize_ED_out(es,i) #i jitne bahar
 
-    NoX = DisCNN(es,EDs_in) #jitne andar hain unko pehle statically assign karo resources
+    NoX = DisCNN(es,
+                 # EDs_in
+                 ) #jitne andar hain unko pehle statically assign karo resources
     X1 = es.X.copy()
     print({models.name for models in es.X})
 

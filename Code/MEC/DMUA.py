@@ -52,7 +52,9 @@ es = EdgeServer(
 
 # Offloaders taken after model caching, utility maximization and resource allocation at t=0
 EDs = initialize_EDs(es,50)
-NoX = DisCNN(es, EDs)
+NoX = DisCNN(es,
+             # EDs
+             )
 # print(*NoX)
 
 # print(es) #Server Utility changes as it is passed by reference to DisCNN function
