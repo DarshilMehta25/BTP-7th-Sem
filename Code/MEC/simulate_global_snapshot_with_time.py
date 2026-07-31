@@ -10,6 +10,7 @@ from Algos.Classes.EdgeServer import EdgeServer
 from Algos.Classes.ED import ED
 from Classes.ED import ED
 from Classes.Model import Model
+from MEC.DynMCS import DynMCS
 # from Graphs.graph_1 import number_of_devices
 from MEC.HaverSineFormula import HaversineFormula
 from MEC.Random_Direction_Model import RandomDirectionModel
@@ -263,7 +264,9 @@ def run(
         # print(len(snapshots[t]))
         # number_of_devices.append((len(snapshots[t])))
         print(f"\n{t:.1f} sec:")
-        DMUMS(es, snapshots[t])
+        # DMUMS(es, snapshots[t])
+        print("DynMCS function called")
+        DynMCS(es, snapshots[t])
 
     # plt.plot(snapshots.keys(), number_of_devices, marker="o")
     # plt.xlabel("Time of 0.5s interval")

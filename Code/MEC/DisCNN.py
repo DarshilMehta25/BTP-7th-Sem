@@ -274,7 +274,7 @@ user_coords_file_path = os.path.join(
 edge_server_data = pd.read_csv(user_coords_file_path)
 
 def DisCNN(es:EdgeServer,
-           # EDs: List[ED]
+           EDs: List[ED]
            ):
 
     # edge_server_lats = edge_server_data["LATITUDE"].head(5)  # Edge Server Latitude
@@ -285,7 +285,7 @@ def DisCNN(es:EdgeServer,
 
     # server = [EdgeServer(20, 800, 1024, 500)]
     esp = ESP(es)
-    EDs = initialize_EDs(es,50) #EDs initialized as within server placement
+    # EDs = initialize_EDs(es,50) #EDs initialized as within server placement
 
 
     # print(*EDs)

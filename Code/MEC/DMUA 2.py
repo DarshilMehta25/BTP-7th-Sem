@@ -42,45 +42,45 @@ es = EdgeServer(
 #Change 5 in simulate global function wala file, comment out es, all_eds as neccessary, same for DisCNN file
 #Change 6 agar sidha simulate global chalana hain for that, DisCNN se ED parameter remove; invoke DisCNN in the former file, comment first defination of all_eds, run mein comment out NoX, outer_eds, initialize es defined in local file, after all this run file....
 
-no_of_devices = []
-models_added = []
-models_removed = []
+# no_of_devices = []
+# models_added = []
+# models_removed = []
 
-for i in range(10,51,5): #10 ke gap mein EDs initialize honge andar bahar
-    no_of_devices.append(i)
+for i in range(10,11): #10 ke gap mein EDs initialize honge andar bahar
+    # no_of_devices.append(i)
     print(f"Devices initialized {i}")
 
     EDs_in = initialize_EDs(es,i) #i jitne andar
     EDs_out = initialize_ED_out(es,i) #i jitne bahar
 
     NoX = DisCNN(es,
-                 # EDs_in
+                 EDs_in
                  ) #jitne andar hain unko pehle statically assign karo resources
-    X1 = es.X.copy()
-    print({models.name for models in es.X})
+    # X1 = es.X.copy()
+    # print({models.name for models in es.X})
 
     run(NoX, EDs_out, es,6) #run for moving users and dynamic caching decision
 
-    print({models.name for models in es.X})
-    print("*"*50)
-    X2  = es.X.copy()
-    X_ = X2 - X1
-    print("Models added:")
-    print({models.name for models in X_})
-    models_added.append(len(X_))
-
-    X_ = X1 - X2
-    print("Models removed:")
-    print({models.name for models in X_})
-    models_removed.append(len(X_))
-
-    print("=="*50)
-    es.X.clear() #Clear cache for next iteration of devices
-
-plt.plot(no_of_devices,models_added,label = "Models Added",color="blue", marker="o")
-plt.plot(no_of_devices,models_removed,label = "Models Removed",color="green", marker="o")
-plt.xlabel("No of Moving Devices")
-plt.ylabel("Model Caching Decision")
-plt.title("Model Caching Decision in Dynamic Scenario")
-plt.legend()
-plt.savefig('./Results/MCD.png', dpi=150)
+#     print({models.name for models in es.X})
+#     print("*"*50)
+#     X2  = es.X.copy()
+#     X_ = X2 - X1
+#     print("Models added:")
+#     print({models.name for models in X_})
+#     models_added.append(len(X_))
+#
+#     X_ = X1 - X2
+#     print("Models removed:")
+#     print({models.name for models in X_})
+#     models_removed.append(len(X_))
+#
+#     print("=="*50)
+#     es.X.clear() #Clear cache for next iteration of devices
+#
+# plt.plot(no_of_devices,models_added,label = "Models Added",color="blue", marker="o")
+# plt.plot(no_of_devices,models_removed,label = "Models Removed",color="green", marker="o")
+# plt.xlabel("No of Moving Devices")
+# plt.ylabel("Model Caching Decision")
+# plt.title("Model Caching Decision in Dynamic Scenario")
+# plt.legend()
+# plt.savefig('./Results/MCD.png', dpi=150)
