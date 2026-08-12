@@ -16,11 +16,11 @@ class ESP:
 
     servers: List[EdgeServer]
     
-    def SRA(self,NoX:List[ED], W:float, F: float):
-        return SRA(NoX, W, F)
+    def SRA(self,NoX:List[ED], es: EdgeServer):
+        return SRA(NoX, es)
         
-    def SUM(self, Nx: List[list: ED], W:float, F:float):
+    def SUM(self, Nx: List[ED], W:float, F:float):
         return SUM(Nx, W, F)
 
-    def MUMS(self, EDs: List[list: ED], J: set, W: float, F: float, S: int):
-        return MUMS(EDs, J, W, F, S)
+    def MUMS(self, EDs: List[ED], J: set, es: EdgeServer):
+        return MUMS(EDs, J, es)

@@ -3,7 +3,7 @@ import copy
 import random
 import threading
 from typing import List, Dict, Tuple
-
+import time
 import pandas as pd
 from DMUMS import DMUMS
 from Algos.Classes.EdgeServer import EdgeServer
@@ -247,7 +247,7 @@ def run(
     all_eds = NoX + eds_out
     random.shuffle(all_eds)
 
-    print(f"Total EDs = {len(all_eds)}")
+    # print(f"Total EDs = {len(all_eds)}")
 
     # step2. deepcopy isliye taki original NoX / es data corrupt na ho
     eds = copy.deepcopy(all_eds)
@@ -260,13 +260,16 @@ def run(
     )
 
     # step4. print kar do result (ids + coordinates dono)
-    for t in sorted(snapshots):
+    # for t in sorted(snapshots):
         # print(len(snapshots[t]))
         # number_of_devices.append((len(snapshots[t])))
-        print(f"\n{t:.1f} sec:")
+        # starttime = time.time()
+        # print(f"\n{t:.1f} sec:")
         # DMUMS(es, snapshots[t])
-        print("DynMCS function called")
-        DynMCS(es, snapshots[t])
+        # endtime = time.time()
+
+        # print("DynMCS function called")
+        # DynMCS(es, snapshots[t])
 
     # plt.plot(snapshots.keys(), number_of_devices, marker="o")
     # plt.xlabel("Time of 0.5s interval")
@@ -275,16 +278,7 @@ def run(
     # plt.savefig('./Results/DMU_50.png', dpi=150)
     # print_snapshots(snapshots)
 
-    # return snapshots
-
-# class PrintHelp:
-#     def __init__(self, ed_id, model):
-#         self.ed_id = ed_id
-#         self.model = model
-
-#yhe se dekh lena agar aur kuch chiye toh @darshil
-
-import time
+    return snapshots
 
 def print_snapshots(snapshots):
     print("\nSnapshots:")

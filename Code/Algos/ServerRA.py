@@ -1,4 +1,5 @@
 from Algos.Classes.ED import ED
+from Algos.Classes.EdgeServer import EdgeServer
 import numpy as np
 from typing import List
 from Algos.ServerRA_i import SRA_i
@@ -9,7 +10,7 @@ from Algos.ServerRA_i import SRA_i
 from dataclasses import replace
 #Server Resource Allocation
 
-def SRA(NoX: List[ED], W: float, F: float):
+def SRA(NoX: List[ED], es: EdgeServer):
 
     how_many_get_res=0
 
@@ -33,7 +34,7 @@ def SRA(NoX: List[ED], W: float, F: float):
 
     for idx,ed in enumerate(NoX): #list pe iterate karte samay, loop creates temporary references for each objects, to replace attributes of real objects in list, we have to use list indexing
        
-     result = SRA_i(ed, W, F)
+     result = SRA_i(ed, es.W, es.F) #pass by values
      # print(ed.id, result)
        
      if result is None:
@@ -48,14 +49,13 @@ def SRA(NoX: List[ED], W: float, F: float):
           Wi_list.append(wi)
           Fi_list.append(fi)
 
-          # ed.allocated_wi = wi
-          # ed.allocated_fi = fi
-
           #Assigning resources to EDs
           NoX[idx] = replace(ed, allocated_wi = wi, allocated_fi = fi, price_paid = utility) #creating new instance with updated values, replacing new ED instance with old, bcoz attribute of instance are frozen, once assigned can't be changed. Replace function return the class with change attribute values
-                
-          W -= wi
-          F -= fi
+
+          #Change in server resources if they are assigned to ED
+          es.W -= wi
+          es.F -= fi
+
           how_many_get_res += 1
 
      else:

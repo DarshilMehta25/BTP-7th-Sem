@@ -286,7 +286,7 @@ def DisCNN(es:EdgeServer,
     # server = [EdgeServer(20, 800, 1024, 500)]
     esp = ESP(es)
     # EDs = initialize_EDs(es,50) #EDs initialized as within server placement
-
+    #
 
     # print(*EDs)
 
@@ -303,8 +303,9 @@ def DisCNN(es:EdgeServer,
     #     transmision_antenna_power_eff_param=0.90
     # )]
 
-    es.X, NxO, es.Utility = esp.MUMS(EDs, J, 20, 800, 1024) #Model Caching Decision
-    _, Wi_List, Fi_List, no_offloaders = esp.SRA(NxO,20,800) #Resource Allocation to EDs maximizing utility of ESP
+    es.X, NxO, _ = esp.MUMS(EDs, J, es) #Model Caching Decision
+    es.Utility, Wi_List, Fi_List, no_offloaders = esp.SRA(NxO,es) #Resource Allocation to EDs maximizing utility of ESP
+
     es.EDs = NxO #assigning EDs which are involved in collaborative inference to server to maintain its record
     es.X = {eds.model for eds in NxO} #Faltu me cache kie hue models nikal jae
 

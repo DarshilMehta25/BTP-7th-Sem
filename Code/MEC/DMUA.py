@@ -8,17 +8,9 @@ from MEC.DisCNN import DisCNN
 from MEC.HaverSineFormula import HaversineFormula
 from typing import List
 from MEC.Random_Direction_Model import RandomDirectionModel
-from dataclasses import replace
-from Algos import test
-
-import threading,time
-from _thread import start_new_thread
 from MEC.N import initialize_EDs
 
 # Setting Up Location of Edge Server
-
-# edge_server_coords_file_path = "./MUA/Dataset/site-optus-melbCBD.csv"
-# edge_server_data = pd.read_csv(filepath_or_buffer=edge_server_coords_file_path)
 
 import os
 
