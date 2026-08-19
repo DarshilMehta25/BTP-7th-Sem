@@ -75,6 +75,7 @@ def simulate_mcs():
     execution_time_dynmcs = []
     avg_execution_time_dynmcs = []
 
+
     for i in range(10,101,10): #5 ke gap mein EDs initialize honge andar bahar
 
         no_of_devices.append(2*i)
@@ -185,8 +186,9 @@ def simulate_mcs():
             end_time = time.time()
             execution_time_dynmcs.append((end_time - start_time))
 
-        avg_execution_time_dynmcs.append(np.mean(execution_time_mums))
+        avg_execution_time_dynmcs.append(np.mean(execution_time_dynmcs))
         execution_time_dynmcs.clear()
+
 
         print("Models in Cache After DynMCS: ")
         print({models.name for models in es.X})
@@ -260,6 +262,9 @@ def simulate_mcs():
 def simulate_SRA(i: int):
 
     no_of_devices_inside: list[int] = [] #list of EDs inside server at any time t
+    no_of_devices_mums: list[int] = []
+    no_of_devices_dmums: list[int] = []
+    no_of_devices_dynmcs: list[int] = []
     timeline = []
 
     models_added_mums = []
@@ -274,7 +279,6 @@ def simulate_SRA(i: int):
     server_util_mums = []
     server_util_dynmcs = []
 
-
     EDs_in = initialize_EDs(es, i)  # i jitne andar
     EDs_out = initialize_ED_out(es, i)  # i jitne bahar
 
@@ -282,6 +286,7 @@ def simulate_SRA(i: int):
                  EDs_in
                  )  # jitne andar hain unko pehle statically assign karo resources
     X1 = es.X.copy()
+    prev = X1.copy() #for dynmcs graph
 
     #Base case scenarios/configurations after static resources assignment
     eds = es.EDs
@@ -317,6 +322,8 @@ def simulate_SRA(i: int):
         print("Dynamic Server Resources Assigned after Running DMUMS")
         server_util_dmums.append(es.Utility) #Server Utility After DMUMS
 
+        no_of_devices_dmums.append(len(es.EDs))
+
         X_ = {}
 
         #Resetting server configurations to base
@@ -344,31 +351,51 @@ def simulate_SRA(i: int):
         print("Dynamic Server Resources Assigned after Running MUMS")
         server_util_mums.append(es.Utility)
 
-        X_ = {}
+        no_of_devices_mums.append(len(es.EDs))
 
-        #Resetting server configurations to base
+        # Resetting server configurations to base
         es.EDs = eds
         es.W = w
         es.F = f
         es.Utility = util
-        es.X = X1 #Reassigning Statically cached so uske comparison main aa sake
 
-        DynMCS(es, snapshots[t])
-        X4 = es.X.copy()
+        # IMPORTANT: copy, otherwise DynMCS may modify X1 itself
+        es.X = X1.copy()
+        # Run DynMCS
+        list_of_models = DynMCS(es, snapshots[t])
+        # Current cache
+        current = set(list_of_models)
+        # Previous cache
+        previous = set(prev)
+        # Models newly added
+        added = current - previous
+        # Models removed
+        removed = previous - current
 
-        X_ = X1 - X4
-        models_added_dynmcs.append(len(X_))
-        print(f"Models Added after DynMCS at {t} seconds")
-        print({models.name for models in X_})
+        print(f"\nTime = {t}")
+        print("Previous:", {m.name for m in previous})
+        print("Current :", {m.name for m in current})
+        print("Added   :", {m.name for m in added})
+        print("Removed :", {m.name for m in removed})
 
-        X_ = X4 - X1
-        models_removed_dynmcs.append(len(X_))
-        print(f"Models Removed after DynMCS at {t} seconds")
-        print({models.name for models in X_})
+        models_added_dynmcs.append(len(added))
+        models_removed_dynmcs.append(len(removed))
+
+        # Current becomes previous for NEXT snapshot
+        prev = list_of_models.copy()
 
         DynSRA(es, snapshots[t])
         print("Dynamic Server Resources Assigned after Running DynMCS")
         server_util_dynmcs.append(es.Utility)
+
+        no_of_devices_dynmcs.append(len(es.EDs))
+
+        # Resetting server configurations to base
+        es.EDs = eds
+        es.W = w
+        es.F = f
+        es.Utility = util
+
 
     plt.figure(2)
     plt.plot(timeline, models_added_dmums, color="blue", label="DMUMS")
@@ -405,14 +432,24 @@ def simulate_SRA(i: int):
 
     #Plot for Mobile Devices in Server with Time
     plt.figure(1)
-    plt.plot(timeline, no_of_devices_inside, marker="o", color = "cyan", linestyle="-")
+    plt.plot(timeline, no_of_devices_inside, marker="o", color = "cyan", linestyle="-.", label="Static")
+    plt.plot(timeline, no_of_devices_dmums, marker="o", color = "blue", linestyle="--", label="DMUMS")
+    plt.plot(timeline, no_of_devices_mums, marker="o", color = "red", linestyle="--", label="MUMS")
+    plt.plot(timeline, no_of_devices_dynmcs, marker="o", color = "green", linestyle="--", label="DynMCS")
     plt.xlabel("TimeLine")
-    plt.ylabel("End Devices inside Server Range")
+    plt.ylabel("End Devices inside Server Range \n Collaborative Inference with Edge Server")
+    plt.legend()
     plt.title("Movement of EDs inside Edge Server with time (0.5s) interval")
     plt.savefig("./DMUA2Result/EDs_Inside_Edge_Server_Timeline.png", dpi=300)
     print("Graphs Plotted and Saved!")
 
+    # print(no_of_devices_mums)
+    # print(no_of_devices_dmums)
+    # print(server_util_mums)
+    # print(server_util_dmums)
+    # print(models_added_dmums)
+    # print(models_removed_dmums)
 
 if __name__ == "__main__":
     # simulate_mcs()
-    simulate_SRA(101)
+    simulate_SRA(11)

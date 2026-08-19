@@ -147,3 +147,11 @@ def DynMCS(es: EdgeServer, snapshot: List[ED]):
     for model in list_of_models:
         if model not in es.X:
             es.X.add(model)
+
+
+    # print("=============================================================")
+    # print("from DynMCS")
+    # print([X.name for X in list_of_models])
+    # print("=============================================================")
+
+    return list_of_models
