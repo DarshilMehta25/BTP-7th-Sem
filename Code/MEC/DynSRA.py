@@ -10,11 +10,11 @@ def DynSRA(es: EdgeServer, eds: List[ED]): #Dynamically Deallocates Server Resou
 
     hand_off_eds = [ed for ed in es.EDs if ed not in eds] #bahar gaye hue EDs
     # print("Handed Off EDs")
-    # print(len(hand_off_eds))
+    print(len(hand_off_eds))
 
     hand_in_eds = [ed for ed in eds if ed not in es.EDs] #bahar se aaye hue
     # print("Handed In EDs")
-    # print(len(hand_in_eds))
+    print(len(hand_in_eds))
 
     potential_offloaders: List[ED] = []
 
@@ -37,14 +37,14 @@ def DynSRA(es: EdgeServer, eds: List[ED]): #Dynamically Deallocates Server Resou
         potential_offloaders.extend(pot_offls) #to add elements of list in list we use extend instead of append
 
     # print("Potential Offloaders")
-    # print(len(potential_offloaders))
+    print(len(potential_offloaders))
     # print(potential_offloaders)
 
     UxSUM, NxO = SUM(potential_offloaders, es.W, es.F) #offloaders maximizing utility of Edge Server
     UxNxO,_,_,succ_offl = SRA(NxO, es) #Allocating server resources to newly added EDs
 
-    # print("Successful Offloaders")
-    # print(succ_offl)
+    print("Successful Offloaders")
+    print(succ_offl)
 
     #Updating Server Cache List of EDs
     temp_list = [ed for ed in es.EDs if ed not in hand_off_eds] #remove handed off EDs

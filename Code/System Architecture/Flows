@@ -1,0 +1,13 @@
+Architecure 1: Overall
+t=0 Static Assignment (DisCNN) -> Mobile User -> Dynamic Caching -> SUM -> Dyn SRA
+
+Architecture 2: Mobile User (Air MUA Paper)
+Single Edge Server -> Middle ESP -> Mobile User changing locations
+
+Architecture 3: Detail Flow
+
+Cloud/Model Repo.
+Quantizer (PTQ FP32 -> Int8)
+Edge Server (ESP Caching Decision and SRA and 4 steps in RAPJM Paper)
+Executor (More Compressed Part of Model)
+End Device (Scheduler)
